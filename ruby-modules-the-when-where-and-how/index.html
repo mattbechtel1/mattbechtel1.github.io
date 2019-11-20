@@ -11,7 +11,7 @@
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="theme-color" content="#2ecc71">
-<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=ruby" defer=""></script>
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=rb" defer=""></script>
 <script type="text/javascript">
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-52446115-1']);
@@ -96,10 +96,11 @@ _gaq.push(['_trackPageview']);
 
   <p>When we extend a module into a class, its methods will become class methods.</p>
 
+  <pre class="prettyprint lang=rb">
   <code>
   module MyModule
-      def clarity
-          "This code is in the clarity method of MyModule"
+     def clarity
+         "This code is in the clarity method of MyModule"
       end
   end
   
@@ -120,6 +121,7 @@ _gaq.push(['_trackPageview']);
   MyClass.clarity => 'This code is in the clarity method of MyModule'
   instance1.clarity => 'This code is in the clarity instance method of MyClass'
   </code>
+  </pre>
 
 ("prepend" a method in a class: the method becomes the most direct ancestor of the class; normally (as in when we 'include' a method), 
 the class is listed as the most direct ancestor.) Since Ruby goes up the family tree to find relevant instance methods when they
