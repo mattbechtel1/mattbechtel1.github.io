@@ -11,8 +11,6 @@
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="theme-color" content="#2ecc71">
-<link rel="canonical" href="http://nandomoreira.me/lora/ruby-modules-the-when-where-and-how">
-<link rel="alternate" type="application/rss+xml" title="Lora" href="http://nandomoreira.me/lora/feed.xml" />
 <script type="text/javascript">
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-52446115-1']);
@@ -23,44 +21,120 @@ _gaq.push(['_trackPageview']);
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 </script>
-    <meta name="robots" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
-    <meta name="googlebot" content="noindex"> <!--=====  Please remove it ! ! !  ======-->
+
   </head>
   <body class="single">
     <main class="container">
-        <header class="site-header">
-  <div class="container txt-center">
-    <nav class="navbar">
-      <ul>
-        <li><a href="/">home</a></li>
-        <li class="divider">&bull;</li>
-        <li><a href="/about">about</a></li>
-        <li class="divider">&bull;</li>
-        <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
-      </ul>
-    </nav>
-    <a href="/" class="author-thumb">
-      <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
-    </a>
-    <h1>Hi, I'm Lora <small>and I'm free Jekyll theme :)</small></h1>
-    <a class="btn" href="https://github.com/nandomoreirame/lora/archive/master.zip" target="_blank">download</a>
-    <hr class="hr">
-  </div>
-</header>
+      <header class="site-header">
+        <div class="container txt-center">
+          <nav class="navbar">
+            <ul>
+              <li><a href="/">home</a></li>
+              <li class="divider">&bull;</li>
+              <li><a href="/about">about</a></li>
+              <li class="divider">&bull;</li>
+              <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
+            </ul>
+          </nav>
+          <a href="/" class="author-thumb">
+            <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+          </a>
+          <h1>Hello, World extended <small>...</small></h1>
+      
+          <hr class="hr">
+        </div>
+      </header>
         <section class="main-content">
           <article class="post">
   <header class="post-header">
     <h1 class="post-title">Ruby Modules: The When, Where, and How</h1>
-    <p class="post-meta">Nov 18, 2019</p>
+    <p class="post-meta">Nov 19, 2019</p>
   </header>
+  <h4>Class v. Module</h4>
+  <p>
+    As nascent Rubyists begin to build simple and moderately-complex object-oriented applications, clarity on the purpose,
+    usefulness, and features of Classes comes quickly. Not only are Classes at the very center of Ruby-based object-oriented
+    programming, they are flexible enough that they can contain additional program code and methods that does not necessarily
+    have to be directly related to the class or instances said Class was designed around.
+  </p>
+  <p>
+    The same cannot be said of Modules, although most beginners will at least have some familiarity with modules even if they have
+    not identified certain Module methods as being Module-based.
+  </p>
+
+  <p>
+    Adding to the confusion is that Ruby's documentation itself does not bother to clearly separate modules from classes. Where 
+    does Ruby list its top open modules? Intermixed with its list of top classes, of course!
+  </p>
+    #INSERT SCREENSHOT OF RUBY MAIN PAGE HERE
+  <p>
+    But that word, 'intermixed', is the key to understanding the relationships between modules and classes. Whereas classes 
+    can certainly share their methods with each other through inheritance .........
+
+
+  <h4>Defining 'Module'</h4>
+
+  <p>Let's step away from the idea of a class for a moment and define module alone. At its most basic <strong>a Ruby module is a 
+    collection of constants and methods</strong>. A module is simply a library where constants and methods reside. 
+    These constants and methods can then be used within a program's defined classes through the concept of a 'mixin'.</p>
+    
+
+  Key fact: Ruby's single inhertance (one parent class) constraint limits how methods can be shared across classes, particularly
+  those that exist at different levels in.
+
+
+  <h4>Prepend, Include, and Extend</h4>
+
+  <p>There are three means of mixing a modules capabilities with a class. They are:</p>
+
+  <ul>
+    <li>Prepend</li>
+    <li>Include</li>
+    <li>Extend</li>
+  </ul>
+
+  <p>When we extend a module into a class, its methods will become class methods.</p>
+
+  <code>
+  module MyModule
+      def clarity
+          "This code is in the clarity method of MyModule"
+      end
+  end
+  
+  class MyClass
+      prepend MyModule
+  
+      def initialize(name)
+          @name = name
+      end
+  
+      def clarity
+          "This code is in the clarity instance method of MyClass"
+      end
+  end
+  
+  instance1 = MyClass.new(instance1)
+  
+  MyClass.clarity => 'This code is in the clarity method of MyModule'
+  instance1.clarity => 'This code is in the clarity instance method of MyClass'
+  </code>
+
+("prepend" a method in a class: the method becomes the most direct ancestor of the class; normally (as in when we 'include' a method), 
+the class is listed as the most direct ancestor.) Since Ruby goes up the family tree to find relevant instance methods when they
+are called, this is key to determining when to include a module and prepend a module.
+
+
+
+</section>
   <div class="post-content">
     <aside class="share">
       <span>Share this: </span>
-      <a href="http://twitter.com/share?text=Ruby Modules: The When, Where, and How&amp;url=http://nandomoreira.me/lora/ruby-modules-the-when-where-and-how&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+      <a href="http://twitter.com/share?text=Ruby Modules: The When, Where, and How&amp;url=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-how&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <i class="icon icon-twitter-rounded"></i>
       </a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=http://nandomoreira.me/lora/ruby-modules-the-when-where-and-how"
+      <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-ho"
       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <i class="icon icon-facebook-rounded"></i>
       </a>
@@ -69,22 +143,23 @@ _gaq.push(['_trackPageview']);
   <hr>
   <aside id="comments" class="disqus">
     <h3>Comments</h3>
+
     <div id="disqus_thread"></div>
     <script type="text/javascript">
-      var disqus_shortname = 'fernandomoreira';
+      var disqus_shortname = 'hello-world-extended';
       var disqus_identifier = '/ruby-modules-the-when-where-and-how';
       var disqus_title = 'Ruby Modules: The When, Where, and How';
-      var disqus_url = 'http://nandomoreira.me/lora';
-      /*var disqus_developer = 1;*/
-      (function() {
-          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-      })();
+      var disqus_url = 'http://mattbechtel1.github.io';
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://hello-world-extended.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
     </script>
-    <noscript>
-      Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
-    </noscript>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
   </aside>
 </article>
         </section>
@@ -93,19 +168,16 @@ _gaq.push(['_trackPageview']);
   <hr>
   <ul class="social">
         <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
-        <li><a href="http://github.com/nandomoreirame" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
         <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
-        <li><a href="http://facebook.com/fernando.dev" target="_blank"><i class="icon icon-facebook"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
         <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
-        <li><a href="http://twitter.com/nandomoreirame" target="_blank"><i class="icon icon-twitter"></i></a></li>
-        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
-        <li><a href="http://instagram.com/nandomoreira.me" target="_blank"><i class="icon icon-instagram"></i></a></li>
-        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
-        <li><a href="http://linkedin.com/in/nandomoreirame" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
   </ul>
   <small>&copy; 2019 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i class="icon icon-heart"></i></small>
   <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
 </footer>
+    </main>
     </main>
     <a href="https://github.com/nandomoreirame/lora" target="_blank" class="github-corner"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#2ecc71; color:#f7f8f9; position: absolute; top: 0; border: 0; right: 0;"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
   </body>
