@@ -36,7 +36,8 @@ body {
 }
 
 ol, ul {
-    list-style: circle
+    list-style: circle;
+   padding-bottom: 10px;
 }
 
 blockquote, q {
