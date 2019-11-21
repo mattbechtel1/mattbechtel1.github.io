@@ -144,7 +144,7 @@
   end
   
   class MyClass
-      prepend MyModule
+      extend MyModule
   
       def initialize(name)
           @name = name
@@ -196,7 +196,7 @@
   instance1 = MyClass.new(instance1)
   
   MyClass.clarity # => undefined method `clarity' for MyClass:Class
-  instance1.clarity # => this code is in the clarity method of MyClass
+  instance1.clarity # => 'this code is in the clarity method of MyModule'
   MyClass.ancestors.first(2) # => [MyModule, MyClass]
   </code></pre>
         <p>
@@ -207,7 +207,7 @@
         </p>
 
         <p>
-          And finally we come to <strong>including</strong> a module in a class.
+          And finally, we can <strong>include</strong> a module in a class.
         </p>
 
         <pre class="prettyprint lang=rb">
@@ -242,7 +242,7 @@ end
 instance1 = MyClass.new(1)
 
 MyClass.clarity # => undefined method `clarity' for MyClass:Class
-instance1.clarity # => this code is in the clarity instance method of MyClass
+instance1.clarity # => 'this code is in the clarity instance method of MyClass'
 instance1.add_one # => 2
 MyClass.ancestors.first # => MyClass
 </code></pre>
