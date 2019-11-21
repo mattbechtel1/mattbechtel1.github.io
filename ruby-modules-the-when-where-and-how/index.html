@@ -57,17 +57,23 @@
         </header>
         <h4>Class v. Module</h4>
         <p>
-            As nascent Rubyists begin to build simple and moderately-complex object-oriented applications, clarity on the purpose, usefulness, and features of Classes solidifies quickly. Not only are Classes at the very center of object-oriented programming, they are flexible enough that they could contain additional program code and methods that does not necessarily have to be directly related to the class or instances said Class was designed around.
+          As nascent Rubyists begin to build simple and moderately-complex object-oriented applications, clarity on the
+          purpose, usefulness, and features of Classes solidifies quickly. Not only are Classes at the very center of
+          object-oriented programming, they are flexible enough that they could contain additional program code and
+          methods that does not necessarily have to be directly related to the class or instances said Class was
+          designed around.
         </p>
 
         <p>
-            The same cannot be said of Modules, although most beginners will at least have some familiarity with modules even if they have not identified certain Module methods as being Module-based.
+          The same cannot be said of Modules, although most beginners will at least have some familiarity with modules
+          even if they have not identified certain Module methods as being Module-based.
         </p>
 
         <img class="sideimage" src="../images/ruby-class-module-doc.png" alt="Ruby's documentation isn't helpful"
           style="float: left;" />
         <p>
-            Adding to the confusion is that Ruby's documentation itself does not bother to clearly separate modules from classes. Where does Ruby list its top open modules? Intermixed in its list of shared classes, of course!
+          Adding to the confusion is that Ruby's documentation itself does not bother to clearly separate modules from
+          classes. Where does Ruby list its top open modules? Intermixed in its list of shared classes, of course!
         </p>
 
         <p>
@@ -98,14 +104,23 @@
         <h4>Defining 'Module'</h4>
 
         <p>
-            Stepping away from the idea of a class for a moment, we should define module alone. At its most basic a Ruby module is a <strong>collection of constants and methods</strong>. A module is simply a library where constants and methods reside. These constants and methods can then be used within a program's defined classes through the concept of a 'mixin'.
+          Stepping away from the idea of a class for a moment, we should define module alone. At its most basic a Ruby
+          module is a <strong>collection of constants and methods</strong>. A module is simply a library where constants
+          and methods reside. These constants and methods can then be used within a program's defined classes through
+          the concept of a 'mixin'.
         </p>
 
         <iframe src="https://giphy.com/embed/3ohjUUxm1IFswwRDY4" width="480" height="480" frameBorder="0"
-          class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/cheddar-food-magic-3ohjUUxm1IFswwRDY4">via GIPHY</a></p>
+          class="giphy-embed" allowFullScreen></iframe>
+        <p><a href="https://giphy.com/gifs/cheddar-food-magic-3ohjUUxm1IFswwRDY4">via GIPHY</a></p>
 
         <p>
-            The inherent limitation of a module is its inability to create an instance of itself. As we'll see below, module methods can still be utilized as instance methods when mixed in with a class. But by staying away from instance-generating capabilities, modules are a little more reliable and stagnant, which make them great for storing constants and housing methods that would need to be accessed by different models in an app, such as methods that encrypt passwords or methods that conduct similar operations across different models within the same app.
+          The inherent limitation of a module is its inability to create an instance of itself. As we'll see below,
+          module methods can still be utilized as instance methods when mixed in with a class. But by staying away from
+          instance-generating capabilities, modules are a little more reliable and stagnant, which make them great for
+          storing constants and housing methods that would need to be accessed by different models in an app, such as
+          methods that encrypt passwords or methods that conduct similar operations across different models within the
+          same app.
         </p>
 
 
@@ -150,7 +165,9 @@
   </pre>
 
         <p>
-            We see that, using the 'extend' keyword to introduce our Class to our Module, methods defined within our module become class methods in our class. Our instance methods remain unchanged. MyClass is listed as first in MyClass's ancestor list, as would be expected of most classes with no inheritance.
+          We see that, using the 'extend' keyword to introduce our Class to our Module, methods defined within our
+          module become class methods in our class. Our instance methods remain unchanged. MyClass is listed as first in
+          MyClass's ancestor list, as would be expected of most classes with no inheritance.
         </p>
 
         <p>
@@ -184,7 +201,10 @@
   MyClass.ancestors.first(2) # => [MyModule, MyClass]
   </code></pre>
         <p>
-            With the 'prepend' keyword, our module shares its methods as instance classes and overwrites any instance classes already located in our class. This is quite different from a class inheritance structure, where a method of a parent class would not overwrite the method in a child class. Our module is able to do this by forcing itself to position one in the ancestors list, even before the name of the class it was called upon!
+          With the 'prepend' keyword, our module shares its methods as instance classes and overwrites any instance
+          classes already located in our class. This is quite different from a class inheritance structure, where a
+          method of a parent class would not overwrite the method in a child class. Our module is able to do this by
+          forcing itself to position one in the ancestors list, even before the name of the class it was called upon!
         </p>
 
         <p>
@@ -229,20 +249,30 @@ MyClass.ancestors.first => MyClass
 </code></pre>
 
         <p>
-            Again, calling our modules method as a class method results in a no method error, and, unlike with 'prepend', by using the 'include' keyword, our class's instance methods have priority over those in the module. However, we are able to call other module-based methods on our instances and can even use instance variables specific to our class within those methods. We can even house our getter and setter methods within the module.
+          Again, calling our modules method as a class method results in a no method error, and, unlike with 'prepend',
+          by using the 'include' keyword, our class's instance methods have priority over those in the module. However,
+          we are able to call other module-based methods on our instances and can even use instance variables specific
+          to our class within those methods. We can even house our getter and setter methods within the module.
         </p>
 
         <p>
-            Because Ruby goes up the family tree to find relevant instance methods when they are called, this is key to determining when to include a module verses when to prepend a module with a class. Extend is used for class methods only.
+          Because Ruby goes up the family tree to find relevant instance methods when they are called, this is key to
+          determining when to include a module verses when to prepend a module with a class. Extend is used for class
+          methods only.
         </p>
 
         <h4>When Should We Incorporate Modules?</h4>
 
         <p>
-            Moving beyond the obvious answer that we use modules such as Enumerables and Math on a day-to-day basis and that various standard support products such as ActiveRecord are themselves modules, modules should probably be used fairly sparingly in simple applications. While modules have the ability to DRY out code, mixing too many modules into classes for a small set of methods can add too much abstraction.
+          Moving beyond the obvious answer that we use modules such as Enumerables and Math on a day-to-day basis and
+          that various standard support products such as ActiveRecord are themselves modules, modules should probably be
+          used fairly sparingly in simple applications. While modules have the ability to DRY out code, mixing too many
+          modules into classes for a small set of methods can add too much abstraction.
         </p>
 
-        <iframe src="https://giphy.com/embed/gOPWeWB9fuxm8" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/weekend-dc-bets-gOPWeWB9fuxm8">via GIPHY</a></p>
+        <iframe src="https://giphy.com/embed/gOPWeWB9fuxm8" width="480" height="360" frameBorder="0" class="giphy-embed"
+          allowFullScreen></iframe>
+        <p><a href="https://giphy.com/gifs/weekend-dc-bets-gOPWeWB9fuxm8">via GIPHY</a></p>
 
         <p>
           Is there a hint that we should be using a module rather than placing methods in classes? If code appears to be
