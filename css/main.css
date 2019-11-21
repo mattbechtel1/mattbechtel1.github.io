@@ -108,7 +108,6 @@ p {
 img {
     display: block;
     margin: 0 0 .6em;
-    vertical-align: middle;
     max-width: 100%
 }
 
@@ -315,7 +314,6 @@ pre code {
 }
 
 .author-thumb img {
-    width: 100px;
     display: inline;
     margin: 0
 }
@@ -452,7 +450,6 @@ pre code {
 
 .icon {
     font-family: "loralicons";
-    speak: none;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
