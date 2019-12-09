@@ -32,6 +32,4 @@ instance1 = MyClass.new(1)
 puts instance1.clarity
 puts instance1.add_one
 puts MyClass.ancestors.first
-puts Math.sqrt(4)
-puts Math::PI
 
