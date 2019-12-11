@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> The For-loop is Dead; Long Live the For-loop | Hello, World extended </title>
+  <meta name="description" content="The For-loop is Dead; Long Live the For-loop">
+  <meta name="keywords" content="ruby, module">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script
+    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=rb"
+    defer=""></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">The For-loop is Dead; Long Live the For-loop</h1>
+          <p class="post-meta">Dec 12, 2019</p>
+        </header>
+        <h4>A Brief History of Ugly Code</h4>
+        <p>
+          I began learning Javascript for the first time nearly 8 years ago (and then proceeded to not use any of it in the interceding 8 years.) It was a simpler time: You were encouraged to declare variables using an incredibly obvious reserved word called ‘var’; all lines of code ended in semicolons; and, despite the language having been around for 15 years, the early-career professional web developers I briefly studied alongside were just venturing into Javascript for the first time.
+        </p>
+
+        <p>
+          That’s right! <em>In 2012, you could land and hold a job as a front-end web developer without having touched Javascript.</em>
+        </p>
+
+        <img class="sideimage" src="../images/ruby-class-module-doc.png" alt="Ruby's documentation isn't helpful"
+          style="float: left;" />
+        
+        <p>
+          As I try to relearn and advance my understanding, I pulled out some of the old code I wrote back then. While it mostly reminded me how much I’d forgotten, my second observation was…
+        </p>
+
+        <p>
+          <strong>My Lord, that’s a lot of for-loops!</strong>
+        </p>
+
+        <p>
+            Reading, manipulating, and looping through arrays is one of the most important skills for Javascript developers to master. Fortunately, a number of tools are available to early developers to master and memorize. The for-loop is just the most boring one.
+        </p>
+
+
+        <h4>ForEach</h4>
+
+        <p>
+            The for-loop the classic iterator. No need for a method call. Just a lot of ugly syntax that is completely unreadable to the uninitiated. The other methods I’ll mention here can all be distilled down to a for-loop as well, but those more complex methods are far more readable when called with their named methods. Still, the for loop remains the unchallenged champion for logging consecutive numbers into a console:
+        </p>
+
+        <pre class="prettyprint lang=rb">
+            <code>
+              function counting() {
+                let str;
+                for (let i = 5; i < 11; i++) {
+                  str += i;
+                }
+                return str;
+              }
+
+              // returns "5678910"
+            </code>
+          </pre>
+
+          <p>
+            So simple, so boring, so confusing for someone who has never read a line of code.
+          </p>
+
+The most similar method would be the ForEach, which quite simply, like a for loop, executes a function for each element in an array, returning nothing.
+          
+
+        <img src="https://media.giphy.com/media/S5320pZ25mDMJuYzR5/giphy.gif" alt="Mix mix mix" style="display: block; margin-left: auto; margin-right: auto;">
+        <p style="text-align: center;"><a href="https://giphy.com/gifs/TheYoungTurks-tyt-the-young-turks-network-S5320pZ25mDMJuYzR5">via GIPHY</a></p>
+
+        <p>
+          The inherent limitation of a module is its inability to create an instance of itself. As we'll see below,
+          module methods can still be utilized as instance methods when mixed in with a class. But by staying away from
+          instance-generating capabilities, modules are a little more reliable and stagnant, which make them great for
+          storing constants and housing methods that would need to be accessed by different models in an app, such as
+          methods that encrypt passwords or methods that conduct similar operations across different models within the
+          same app.
+        </p>
+
+
+        <h4>Prepend, Include, and Extend</h4>
+
+        <p>There are keywords that allow us to mix a module's methods into a class. They are:</p>
+
+        <ul>
+          <li>Extend</li>
+          <li>Prepend</li>
+          <li>Include</li>
+        </ul>
+
+        <p>When we <strong>extend</strong> a module into a class, its methods will become class methods.</p>
+
+        <pre class="prettyprint lang=rb">
+  <code>
+  module MyModule
+     def clarity
+         "This code is in the clarity method of MyModule"
+      end
+  end
+  
+  class MyClass
+      extend MyModule
+  
+      def initialize(name)
+          @name = name
+      end
+  
+      def clarity
+          "This code is in the clarity instance method of MyClass"
+      end
+  end
+  
+  instance1 = MyClass.new(instance1)
+  
+  MyClass.clarity # => 'This code is in the clarity method of MyModule'
+  instance1.clarity # => 'This code is in the clarity instance method of MyClass'
+  MyClass.ancestors.first # => MyClass
+  </code>
+  </pre>
+
+        <p>
+          We see that, using the 'extend' keyword to introduce our Class to our Module, methods defined within our
+          module become class methods in our class. Our instance methods remain unchanged. MyClass is listed as first in
+          MyClass's ancestor list, as would be expected of most classes with no inheritance.
+        </p>
+
+        <p>
+          Next up: <strong>prepend</strong>
+        </p>
+
+        <pre class="prettyprint lang=rb">
+  <code>
+  module MyModule
+      def clarity
+          "This code is in the clarity method of MyModule"
+      end
+  end
+  
+  class MyClass
+      prepend MyModule
+  
+      def initialize(name)
+          @name = name
+      end
+  
+      def clarity
+          "this code is in the clarity instance method of MyClass"
+      end
+  end
+  
+  instance1 = MyClass.new(instance1)
+  
+  MyClass.clarity # => undefined method `clarity' for MyClass:Class
+  instance1.clarity # => 'this code is in the clarity method of MyModule'
+  MyClass.ancestors.first(2) # => [MyModule, MyClass]
+  </code></pre>
+        <p>
+          With the 'prepend' keyword, our module shares its methods as instance classes and overwrites any instance
+          classes already located in our class. This is quite different from a class inheritance structure, where a
+          method of a parent class would not overwrite the method in a child class. Our module is able to do this by
+          forcing itself to position one in the ancestors list, even before the name of the class it was called upon!
+        </p>
+
+        <p>
+          And finally, we can <strong>include</strong> a module in a class.
+        </p>
+
+        <pre class="prettyprint lang=rb">
+<code>
+module MyModule
+    def clarity
+        "This code is in the clarity method of MyModule"
+    end
+ 
+    def num
+        @num
+    end
+
+    def add_one
+        self.num + 1
+    end   
+end
+
+class MyClass
+    include MyModule
+
+    def initialize(num)
+        @num = num
+    end
+
+
+    def clarity
+        "this code is in the clarity instance method of MyClass"
+    end
+end
+
+instance1 = MyClass.new(1)
+
+MyClass.clarity # => undefined method `clarity' for MyClass:Class
+instance1.clarity # => 'this code is in the clarity instance method of MyClass'
+instance1.add_one # => 2
+MyClass.ancestors.first # => MyClass
+</code></pre>
+
+        <p>
+          Again, calling our modules method as a class method results in a no method error, and, unlike with 'prepend',
+          by using the 'include' keyword, our class's instance methods have priority over those in the module. However,
+          we are able to call other module-based methods on our instances and can even use instance variables specific
+          to our class within those methods. We can even house our getter and setter methods within the module.
+        </p>
+
+        <p>
+          Because Ruby goes up the family tree to find relevant instance methods when they are called, this is key to
+          determining when to include a module verses when to prepend a module with a class. Extend is used for class
+          methods only.
+        </p>
+
+        <h4>When Should We Incorporate Modules?</h4>
+
+        <p>
+          Moving beyond the obvious answer that we use modules such as Enumerables and Math on a day-to-day basis and
+          that various standard support products such as ActiveRecord are themselves modules, modules should probably be
+          used fairly sparingly in simple applications. While modules have the ability to DRY out code, mixing too many
+          modules into classes for a small set of methods can add too much abstraction.
+        </p>
+
+        <img src="https://media.giphy.com/media/gOPWeWB9fuxm8/giphy.gif" alt="Mix mix mix" style="display: block; margin-left: auto; margin-right: auto;">
+        <p class="iframelabel"><a href="https://giphy.com/gifs/weekend-dc-bets-gOPWeWB9fuxm8">via GIPHY</a></p>
+
+        <p>
+          Is there a hint that we should be using a module rather than placing methods in classes? If code appears to be
+          repetitive across our classes, then placing methods in a module could probably take their place. Another
+          situation is if we have a set of methods that are not obviously related to a single class but have some kind
+          of commonality (such as all our math functions), they probably belong in a module.
+        </p>
+
+
+
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=The For-loop is Dead; Long Live the For-loop&amp;url=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-how&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-ho"
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/ruby-modules-the-when-where-and-how';
+        var disqus_title = 'The For-loop is Dead; Long Live the For-loop';
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2019 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
