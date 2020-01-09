@@ -76,7 +76,7 @@
           Why is this important? It means that updating our state values is not quite as easy as just making a new declation in Javascript. The following code works as expected, setting the initial state in the constructor and then updating directly through the function.
         </p>
 
-  <pre class="prettyprint lang=xml">
+  <pre class="prettyprint lang=html">
     <code>
       import React from 'react'
 
@@ -90,7 +90,7 @@
             console.log(this.state.myState) // logs false to the console
             this.state.myState = true
             console.log(this.state.myState) // logs true to the console
-            return '<a />'
+            return <div />
         }
       }
     </code>
@@ -495,7 +495,7 @@ export default Header
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=The For-loop is Dead; Long Live the For-loop&amp;url=http://mattbechtel1.github.io/posts/react-set-async-state&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+        <a href="http://twitter.com/share?text=Reacting to the Async State&amp;url=http://mattbechtel1.github.io/posts/react-set-async-state&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
