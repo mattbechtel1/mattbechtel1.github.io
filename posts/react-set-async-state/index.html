@@ -69,18 +69,96 @@
         </comment>
         
         <p>
-          State's mutability is what makes it such a powerful tool in web development, but that dynamism could lead to some awfully slow rendering for large datasets, poorly coded recursive programs, and programs that make calls to many async processes. React, however, emphasizes performance. The result is that updating state is an async process in React's lifecycle.
+          State's mutability is what makes it such a powerful tool in web development, but that dynamism could lead to some awfully slow rendering for large datasets, poorly coded recursive programs, and programs that make calls to many async processes. React, however, emphasizes performance. The result is that React updates state off of browser events asychronously.
         </p>
 
         <p>
-            Reading, manipulating, and looping through arrays is one of the most important skills for Javascript developers to master. Fortunately, a number of tools are available to early developers to master and memorize. The for-loop is just the most boring one.
+          Why is this important? It means that updating our state values is not quite as easy as just making a new declation in Javascript. The following code works as expected, setting the initial state in the constructor and then updating directly through the function.
         </p>
 
+  <pre class="prettyprint lang=xml">
+    <code>
+      import React from 'react'
 
-        <h4>ForEach</h4>
+      export default class Applet extends React.Component {
+        constructor() {
+          super()
+          this.state = { myState: false }
+        }
+
+        render() {
+            console.log(this.state.myState) // logs false to the console
+            this.state.myState = true
+            console.log(this.state.myState) // logs true to the console
+            return '<a />'
+        }
+      }
+    </code>
+  </pre>
+
+  <p>
+    This does not really change for simple mutations, even when we chain multiple methods or pass the state as a prop to a child component.
+  </p>
+
+  <pre class="prettyprint lang=js">
+    <code>
+import React from 'react'
+import Header from './Header'
+
+export default class Applet extends React.Component {
+    constructor() {
+        super()
+        this.state = { myState: 'initial' }
+    }
+
+    updateState = () => { 
+        this.state.myState = 'updated state'
+        return this.state.myState
+    }
+
+    mutateState = () => { 
+        this.state.myState += " has been mutated"
+        return this.state.myState
+    }
+
+    render() {
+        console.log(this.state.myState) // logs 'initial' to console
+        console.log(this.mutateState()) // logs 'initial has been mutated' to console
+        console.log(this.updateState()) // logs 'updated state' to console
+        console.log(this.mutateState()) // logs 'updated state has been mutated' to console
+        return <Header myState={this.mutateState()} />
+    }
+}
+
+// Header.js
+
+import React from 'react'
+
+class Header extends React.Component {
+	
+	render() {
+		console.log(this.props.myState) // logs 'updated state has been mutated has been mutated' to console
+		return <a />
+	}
+}
+
+export default Header
+    </code>
+  </pre>
+        
+
+        <h4>Why does React Update State Asynchronously?</h4>
 
         <p>
-            The for-loop the classic iterator. No need for a method call. Just a lot of ugly syntax that is completely unreadable to the uninitiated. The other methods I’ll mention here can all be distilled down to a for-loop as well, but those more complex methods are far more readable when called with their named methods. Still, the for loop remains the unchallenged champion for logging consecutive numbers into a console:
+          Typically, when we think of asychronous processes, we think of processes related to speaking with the server, not the DOM. It makes sense to make calls to our servers asychronous, as  requests and data are passed between machines and data structures. There is a required delay for promises to be resolved.
+        </p>
+
+        <p>
+          Changing state in React, on the other hand, does not necessarily require sending a request to a server, just the DOM. The advantage of calling <strong>setState</strong> asynchronously is that React can batch multiple updates. An application with many components will likely have event handlers on multiple components that will call <strong>setState</strong>. If a parent and child components both call setState from the same click event, React will batch the two calls together, which avoids re-rendering components twice. This can only be completed asynchronously.
+        </p>
+
+        <p>
+
         </p>
 
   <pre class="prettyprint lang=js">
