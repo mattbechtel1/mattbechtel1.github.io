@@ -73,7 +73,7 @@
         </p>
 
         <p>
-          Why is this important? It means that updating our state values is not quite as easy as just making a new declation in Javascript. The following code works as expected, setting the initial state in the constructor and then updating directly through the function.
+          Why is this important? It means that updating our state values is not quite as easy as just making a new declaration in Javascript. The following code works as expected, setting the initial state in the constructor and then updating directly through the function.
         </p>
 
   <pre class="prettyprint lang=js">
@@ -182,7 +182,7 @@ export default class Applet extends React.Component {
         <h4>Why does React Update State Asynchronously?</h4>
 
         <p>
-          Typically, when we consider asychronous processes, we think of processes related to speaking with the server, not the DOM. It makes sense to make calls to our servers asychronous, as  requests and data are passed between machines. There is a required delay for promises to be resolved.
+          Typically, when we consider asynchronous processes, we think of processes related to speaking with the server, not the DOM. It makes sense to make calls to our servers asynchronous, as  requests and data are passed between machines. There is a required delay for promises to be resolved.
         </p>
 
         <p>
@@ -309,7 +309,7 @@ class Header extends React.Component {
         <h4>SetState in the Component Lifecycle</h4>
         
         <p>
-          The setState() method is only available at certain parts of the component lifecycle. While it is not technically available in the constructor() method, <strong>this.state</strong> can be set equal to a javascript object to provide the component's state with initial values. 
+          The setState() method is only available at certain parts of the component lifecycle. While it is not technically available in the constructor() method, <strong>this.state</strong> can be set equal to a JavaScript object to provide the component's state with initial values. 
         </p>
 
           <p>
@@ -386,7 +386,7 @@ export default Header
 
           <p>
             The code above is bit much, but it will print to the console four times.
-            <ol>
+            <ol type="1">
               <li>
                 On the initial rendering of the Header child based on the initial values of state, it will log "Upon child render, I am bored and hungry"
               </li>
