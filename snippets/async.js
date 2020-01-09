@@ -9,11 +9,15 @@ export default class Applet extends React.Component {
     }
 
     updateState = () => {
-        this.state.myState = 'updated state'
+        this.setState(
+            {myState: 'updated state'}
+        )
     }
 
     mutateState = () => {
-        this.state.myState += " has been mutated"
+        this.setState(
+            {myState: this.state.myState += " has been mutated"}
+        )
     }
 
     render() {

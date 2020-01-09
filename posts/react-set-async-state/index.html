@@ -13,7 +13,7 @@
   <meta name="MobileOptimized" content="320">
   <meta name="theme-color" content="#2ecc71">
   <script
-    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=rb"
+    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js&lang=html"
     defer=""></script>
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -76,7 +76,7 @@
           Why is this important? It means that updating our state values is not quite as easy as just making a new declation in Javascript. The following code works as expected, setting the initial state in the constructor and then updating directly through the function.
         </p>
 
-  <pre class="prettyprint lang=html">
+  <pre class="prettyprint lang=js">
     <code>
       import React from 'react'
 
@@ -90,7 +90,7 @@
             console.log(this.state.myState) // logs false to the console
             this.state.myState = true
             console.log(this.state.myState) // logs true to the console
-            return <div />
+            return ( >div/> )
         }
       }
     </code>
@@ -126,7 +126,7 @@ export default class Applet extends React.Component {
         console.log(this.mutateState()) // logs 'initial has been mutated' to console
         console.log(this.updateState()) // logs 'updated state' to console
         console.log(this.mutateState()) // logs 'updated state has been mutated' to console
-        return <Header myState={this.mutateState()} />
+        return >Header myState={this.mutateState()} />
     }
 }
 
@@ -138,7 +138,7 @@ class Header extends React.Component {
 	
 	render() {
 		console.log(this.props.myState) // logs 'updated state has been mutated has been mutated' to console
-		return <a />
+		return >div />
 	}
 }
 
@@ -146,11 +146,43 @@ export default Header
     </code>
   </pre>
         
+  <p>
+    In fact, if we replace those declarative statements with a call to <strong>setState</strong>, we error out with a nasty recursion if we keep calls to setState within the render method.
+  </p>
+
+  <pre class="prettyprint lang=js">
+    <code>
+import React from 'react'
+
+export default class Applet extends React.Component {
+  constructor() {
+      super()
+      this.state = { myState: 'initial' }
+  }
+
+  updateState = () => {
+      this.setState({myState: 'updated state'})
+  }
+
+  render() {
+      console.log(this.state.myState) // logs 'initial' to console
+      this.updateState() // logs 'updated state' to console repeatedly
+      return >Header myState={this.state} /> // component is correctly rendered until stack maximum is reached
+  }
+}
+    </code>
+  </pre>
+
+
+  <p>
+    So, what is the point? We can happily change our state with declarations, and using React's methods of choice overflows our stack. Surely, there is a reason for this madness.
+  </p>
+
 
         <h4>Why does React Update State Asynchronously?</h4>
 
         <p>
-          Typically, when we think of asychronous processes, we think of processes related to speaking with the server, not the DOM. It makes sense to make calls to our servers asychronous, as  requests and data are passed between machines and data structures. There is a required delay for promises to be resolved.
+          Typically, when we consider asychronous processes, we think of processes related to speaking with the server, not the DOM. It makes sense to make calls to our servers asychronous, as  requests and data are passed between machines. There is a required delay for promises to be resolved.
         </p>
 
         <p>
@@ -158,337 +190,223 @@ export default Header
         </p>
 
         <p>
-
+          Below is an example of a duel call to <strong>setState</strong>. Both the parent (Applet) and child (Header) div are listening for clicks and are programmed to change the same state attribute. 
         </p>
 
   <pre class="prettyprint lang=js">
     <code>
-      function counting() {
-        let str = "";
-        for (let i = 5; i < 11; i++) { 
-          str = str += i;
-        }
-        return str;
+import React from 'react'
+import Header from './Header'
+
+export default class Applet extends React.Component {
+  constructor() {
+      super()
+      this.state = {
+          myState: 'bored' }
+  }
+
+  updateMyState = () => {
+      this.setState({myState: 'hungry'})
+  }
+
+  updateMyStateFromChild= () => {
+      this.setState({myState: 'intrigued'})
       }
 
-      counting()
-      // returns "5678910"
+  render() {
+      console.log(this.state.myState) // logs 'bored' to console at initial render, then 'hungry' on subsequent clicks
+      return (
+          >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
+              >Header passedState={this.state} passedMethod={this.updateMyStateFromChild} />
+          >/div>
+  )}
+}
+
+// Header.js
+import React from 'react'
+
+class Header extends React.Component {
+	
+	render() {
+		// console.log(this.props.myState)
+		return >div onClick={this.props.passedMethod}>
+			>div>My State is {this.props.passedState.myState}>/div> //displays state as bored on initial render, and then hungry after other clicks.
+		>div>
+	}
+}
+
+export default Header
     </code>
   </pre>
 
           <p>
-            So simple, so boring, so confusing for someone who has never read a line of code.
+            While we cannot witness a state change to the value of 'intrigued' with this code, the applet does not break and React manages the handle the state change with ease.
           </p>
 
           <p>
-            The most similar method would be the ForEach, which quite simply, like a for loop, executes a function for each element in an array, returning nothing.
+            But, what if we don't use <strong>setState()</strong> in this dual situation? What if we try to set things with our old friend, '=' ?
           </p>
 
   <pre class="prettyprint lang=js">
     <code>
-      const arr = [5, 6, 7, 8, 9, 10];
-      function countingWithForEach(array) {
-        let str = "";
-        array.forEach (number => str += `${number}`);
-        return str;
-      }
+import React from 'react'
+import Header from './Header'
 
-      countingWithForEach(arr)
-      // returns "5678910"
+export default class Applet extends React.Component {
+    constructor() {
+        super()
+        this.state = {
+            myState: 'bored' }
+    }
+
+    updateMyState = () => { 
+        this.state.myState = 'hungry'
+        console.log(this.state.myState)
+    }
+
+    updateMyStateFromChild= () => { 
+        this.state.myState = 'intrigued'
+        console.log(this.state.myState)    
+    }
+
+    render() {
+        console.log(this.state.myState) // logs 'bored' to console at initial render, then both 'hungry' and 'intrigued' on subsequent clicks
+        return (
+            >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
+                >Header passedState={this.state} passedMethod={this.updateMyStateFromChild} />
+            >/div>
+    )}
+}
+
+
+// Header.js
+import React from 'react'
+
+class Header extends React.Component {
+	
+	render() {
+		return >div onClick={this.props.passedMethod}>
+			>div>My State is {this.props.passedState.myState}>/div> //displays state as bored on initial render, and does not change with the clicks.
+		>div>
+	}
+}
     </code>
   </pre>
 
           <p>
-            Admittedly, this is not much of an improvement on the classic for-loop. We avoid the need to declare an index position, but the code is much the same. The real value of iterators is found in the more transformational methods.
+            While setState() will automatically fire off processes to rerender our affected components, simply reassigning our state, does not cause anything to change on the DOM.
+          </p>
+
+          <p>
+            Interestingly enough, if we were to call our parent class's render method from within our state changing method. And when we do, the console.log() in the method will log our updated state value, but the child component will still not rerender on the DOM with the updated state value. (It is being returned to our update method, not the React parent component.)
+          </p>
+
+          <p>
+            By compiling multiple requests of setState before changing the state, React is also able to edit multiple components in one go, which improves performance.
           </p>
 
 
-        <h4>Map</h4>
+        <h4>SetState in the Component Lifecycle</h4>
         
         <p>
-            The first iterator of interest is map, most useful when we are given an array of elements we wish to transform into an array of the same length, but with edited values. For example, we might have a list of names entered with all lowercase letters, but we wish to capitalize them. As a for loop, our map method to fix our array would look something like:
+          The setState() method is only available at certain parts of the component lifecycle. While it is not technically available in the constructor() method, <strong>this.state</strong> can be set equal to a javascript object to provide the component's state with initial values. 
         </p>
 
-  <pre class="prettyprint lang=js">
-    <code>
-      let beatles = ['john', 'paul', 'george', 'pete']
-
-      let capitalizeName = name => name.charAt(0).toUpperCase() + name.slice(1)
-
-      function capAllNames(names) {
-        let capNames = new Array;
-        for (i = 0; i < names.length; i++) {
-          capNames[i] = capitalizeName(names[i]);
-        }
-        return capNames;
-      }
-      
-      capAllNames(beatles)
-      // returns ["John", "Paul", "George", "Pete"]
-    </code>
-  </pre>
+          <p>
+            As we discovered earlier, setState() is not really available during the render() due to stack overflow from infinite recursion. SetState() is available during the ComponentDidMount() phase.
+          </p>
 
           <p>
-            Boy is that ugly, but it gets the job done! Of course, there's one other problem... While we appreciate 'pete's' time in our beatles array, he really does not fit it. We need to take him out and put 'ringo' in, then capitalize again.
+            While calling setState() in ComponentDidMount() will trigger additional rendering, it occurs before React updates the screen, so the user experience is largely unaffected. React's documentation suggests avoiding setState() here except for cases where the state may be dependent on screen measurement (for example, what space is available for modals), since almost everything else could be set in the constructor.
+          </p>
+
+          <p>
+            ComponentDidUpdate() also allows us to call setState(), which is highly sensible. However, the setState() call must be wrapped in a conditional statement to avoid an infinite loop.
+          </p>
+
+          <p>
+            An alternative to calling setState() within ComponentDidUpdate() is to call it within... setState(). While our above examples only passed one argument (the update object) to the method, setState will also accept a second argument. The second argument is a callback function that will be fired once setState merges the first argument object with the existing state and rerenders the component. This method of updating, while not preferred by React's developers, more neatly mimics the call-and-response pattern used in API fetch requests. 
           </p>
 
   <pre class="prettyprint lang=js">
     <code>
-      let beatles = ['john', 'paul', 'george', 'pete']
-      delete beatles[3]
-      beatles.push('ringo')
+import React from 'react'
+import Header from './Header'
 
-      let capitalizeName = name => name.charAt(0).toUpperCase() + name.slice(1)
-
-      function capAllNames(names) {
-        let capNames = new Array;
-        for (i = 0; i < names.length; i++) {
-          capNames[i] = capitalizeName(names[i]);
-        }
-        return capNames;
-      }
-      
-      capAllNames(beatles)
-      // returns Uncaught TypeError: Cannot read property 'charAt' of undefined
-    </code>
-  </pre>
-
-          <p>
-            Hmmm... our simple for-loop has a problem with the empty slot in our array left by kicking 'pete' out. It's a edge-case, for sure, but it would be great if the capAllNames function could adjust for this without having to add a series of conditional statments to our block.
-          </p>
-
-          <p>
-            Enter the map iterator method:
-          </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let beatles = ['john', 'paul', 'george', 'pete']
-      delete beatles[3]
-      beatles.push('ringo')
-
-      let capitalizeName = name => name.charAt(0).toUpperCase() + name.slice(1)
-      
-      beatles.map (name => capitalizeName(name));
-      // returns ["John", "Paul", "George", empty, "Ringo"]
-    </code>
-  </pre>
-
-      <p>
-        We distilled our function to an easy one-liner for the map call. The map method also kindly passes over empty values of the array rather than give us an error. That’s great, since it allows our applications to continue without breaking if some object or data has been removed from our arrays. If we were limited to for-loops, we would have had to either add conditional statements that would make our code longer or research ways to remove empty values from our data arrays. With the map method, we can just...
-      </p>
-
-      <iframe src="https://giphy.com/embed/SgujNpslwiOc0" width="480" height="480" frameBorder="0" class="giphy-embed" allowFullScreen, style="display: block; margin-left: auto; margin-right: auto;"></iframe><p style="text-align: center;"><a href="https://giphy.com/gifs/love-beatles-lennon-SgujNpslwiOc0">via GIPHY</a></p>
-
-      <h4>Reduce</h4>
-
-      <p>
-        Another convenient iterator is JavaScript’s reduce method. This method allows us to reduce a number of values down to one. If we were to write a reduce method as a for-loop:
-      </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let renaissanceArtists = ['splinter', 'leonardo', 'raphael', 'michelangelo', 'donatello']
-      
-      function longestName(names) {
-        let longName = new String;
-        for (let i = 0; i < names.length; i++) {
-          longName = longName.length > names[i].length ? longName : names[i];
-      }
-        return longName;
-      }
-
-      longestName(renaissanceArtists);
-      // returns 'michelangelo'
-    </code>
-  </pre>
-
-  <p>
-    Excellent. Exactly, what we expected. A bit of a long route to get there, having to take time to initialize the loop function, the default empty string, and the index for our loop, in addition to the array. Upon closer look, someone put a 'splinter' in our list of Italian Renaissance Artists, and I don't think recall any Splinters being mentioned in art history class. Let's remove him and run it again.
-  </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let renaissanceArtists = ['splinter', 'leonardo', 'raphael', 'michelangelo', 'donatello']
-      delete renaissanceArtists[0]
-      
-      function longestName(names) {
-        let longName = new String;
-        for (let i = 0; i < names.length; i++) {
-          longName = longName.length > names[i].length ? longName : names[i];
-      }
-        return longName;
-      }
-
-      longestName(renaissanceArtists);
-      // returns Uncaught TypeError: Cannot read property 'length' of undefined
-    </code>
-  </pre>
-
-  <p>
-    That was disappointing. Our reduction for-loop can't read the string length for the empty element at renaissanceArtists[0]. In old Javascript, we would need to add so many conditional statements to account for every edge case in order for our function to work every time we call upon it, or painstakenly go through our arrays to make sure our data meets a standard. That seems like way too much work.
-  </p>
-
-  <iframe src="https://giphy.com/embed/cFdHXXm5GhJsc" width="480" height="377" frameBorder="0" class="giphy-embed" allowFullScreen style="display: block; margin-left: auto; margin-right: auto;"></iframe><p style='text-align: center'><a href="https://giphy.com/gifs/tmnt-teenage-mutant-ninja-turtles-cFdHXXm5GhJsc">via GIPHY</a></p>
-    
-  <p>
-    Could Javascript’s built-in .reduce method help? 
-  </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let renaissanceArtists = ['splinter', 'leonardo', 'raphael', 'michelangelo', 'donatello']
-      delete renaissanceArtists[0]
-
-      renaissanceArtists.reduce( (longest, name) => longest.length > name.length ? longest : name );
-      // returns 'michelangelo'
-    </code>
-  </pre>
-
-  <p>
-    Much better. We don't even need to write a single '{' or '}' nor do we take time to declare an initial variable.
-  </p>
-
-  <h4>Find</h4>
-
-  <p>
-    Another means of turning an array of elements into one return value would be Javascript's .find method. Whereas .reduce will have the elements of an array interact with each other to return a final value, the .find method will return an untransformed element (unless the method is called in combination with some other method or callback function).
-  </p>
-
-  <p>
-    Trying out the for-loop method first, we want to return a select element based on our query value.
-  </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let suspects = [{name: 'Philip Gerard', possessedBy: 'MIKE'}, {name: 'Leo Johnson'}, {name: 'Benjamin Horne', possessedBy: 'greed'}, {name: 'Log', possessedBy: 'Log Lady’s late husband'}, {name: 'Jacques Renault'}, {name: 'Leland Palmer', possessedBy: 'BOB'}];
-
-      function whoKilledLaura(suspects, evilSpirit) {
-        for (i = 0; i < suspects.length; i++) {
-            if (suspects[i].possessedBy === evilSpirit) {
-                return suspects[i].name;
-                }
-            }
-        }
-    
-      whoKilledLaura(suspects, 'BOB');
-      // returns 'Leland Palmer'
-    </code>
-  </pre>
-
-  <p>
-    Nesting an if statement inside our loop? Yuck.
-  </p>
-
-  <p>
-    Unlike our earlier for-loops, our funcation, or more specifically, the 'if' conditional, can handle empty objects and object properties this time, and it returns the suspect possessed by BOB like we wanted. But there's probably a way to clear that up a little. With .find our function again can shrink to a single line: 
-  </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      let suspects = [{name: 'Philip Gerard', possessedBy: 'MIKE'}, {name: 'Leo Johnson'}, {name: 'Benjamin Horne', possessedBy: 'greed'}, {name: 'Log', possessedBy: 'Log Lady’s late Husband'}, {name: 'Jacques Renault'}, {name: 'Leland Palmer', possessedBy: 'BOB'}];
-
-      suspects.find(suspect => suspect.possessedBy === 'BOB').name;
-      // returns 'Leland Palmer'
-    </code>
-  </pre>
-
-  <p>
-    WOW BOB WOW! .find was able to distill that four-line function into one clear statement. And we didn't even have to use the Tibetan method.
-  </p>
-
-  <iframe src="https://giphy.com/embed/l1IY769JsOzE3taIE" width="480" height="318" frameBorder="0" class="giphy-embed" allowFullScreen style="display: block; margin-left: auto; margin-right: auto;"></iframe><p style='text-align: center'><a href="https://giphy.com/gifs/season-1-episode-3-twin-peaks-l1IY769JsOzE3taIE">via GIPHY</a></p>
-
-  <h4>Filter</h4>
-  
-  <p>
-    The final standard iterator to explore is the filter method. Filter takes an array and returns another array of smaller or equal size depending on the condition we pass into the filter. In 2012, I would have (well, I actually did) filtered a hand of playing cards with a for-loop:
-  </p>
-
-  <pre class="prettyprint lang=js">
-    <code>
-      // Go Fish!
-      // myHand and oppHand are defined arrays of cards within the relevant scope, each with assigned values (Ace, King, 8) for this.valueID. myScore & oppScore are the scores for the two players.
-      
-      function scoreCheck(player,valueToCheck) {
-        var i;
-        var y;
-        var handCount = 0;
-        for (i = 0; i < player.length; i++) {
-            if (player[i].valueID === valueToCheck) {
-                handCount += 1;
-            }
-            if (handCount >=4 && player === oppHand) {
-                console.log("Your opponent collected a set of " + cardValue + "s.");
-                oppScore += 1;
-                for (y = 0; y < oppHand.length; y++) {
-                    if (oppHand[y].valueID === valueToCheck) {
-                        discard[discard.length] = oppHand[y];
-                        oppHand.splice(y,1);
-                        y--;
-                        }
-                    }
-                }
-            } else if (handCount >= 4 && player === myHand) {
-                console.log("You collected a set of " + cardValue[valueToCheck] + "s.");
-                myScore += 1;
-                for (y = 0; y < myHand.length; y++) {
-                    if (myHand[y].valueID === valueToCheck) {
-                        discard[discard.length] = myHand[y];
-                        myHand.splice(y,1);
-                        y--;
-                        }
-                    }
-                }
-            }
+export default class Applet extends React.Component {
+    constructor() {
+        super()
+        this.state = {
+            myState: 'bored',
+            myAppetite: 'hungry',
+            sleeping: true
+         }
     }
-  </code>
-</pre>
 
-<p>
-  <strong>AHHHHHHHHHH!</strong>
-</p>
+    updateMyState = () => { 
+        this.setState({
+            myState: 'intrigued',
+            sleeping: false
+        }, this.updateMyAppetite)
+    }
 
-<p>
-  This is what pre-2011 JavaScript required. In early 2012, when I wrote that, the .filter method had been around for less than a year and was not included in the cirriculum I was following. Today, my scoreCheck() method would be a little easier to follow.
-</p>
+    updateMyAppetite = () => {
+        const {sleeping, myAppetite, myState} = this.state
+        console.log("Between processes, I am", myState, "and", myAppetite)
 
-  <pre class="prettyprint lang=js">
-    <code>
-      let myHand = //an array of cards
-      let oppHand = //an array of cards
-
-      function scoreCheck(playerHand, valueToCheck) {
-        cardsOfValue = playerHand.filter( card => card.valueID === valueToCheck )
-        
-        if (cardsOfValue.length === 4 && playerHand === myHand ) {
-          console.log(`You collected a set of ${valueToCheck}s!`);
-          myHand = playerHand.filter (card => card.valueID !== valueToCheck);
+        if (!sleeping) {
+            this.setState({myAppetite: 'satiated'})
         }
+    }
 
-        else if (cardsOfValue.length === 4 && playerHand === oppHand) {
-          console.log(`Your opponent collected a set of ${valueToCheck}s`)
-          oppHand = playerHand.filter (card => card.valueID !== valueToCheck);
-        }
-      }   
+    render() {
+        return (
+            >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
+                >Header passedState={this.state} />
+            >div>
+    )}
+}
+
+// Header.js
+
+import React from 'react'
+
+class Header extends React.Component {
+	render() {
+		console.log('Upon child render, I am', this.props.passedState.myState, 'and' this.props.passedState.myAppetite)
+		return >div>
+			>div>My State is {this.props.passedState.myState} >/div>
+		>/div>
+	}
+}
+
+export default Header
     </code>
   </pre>
 
-  <p>
-    My scoreCheck function for 'Go Fish!' has been shrunk from a twisting series of for-loops that would even at times need to subtract from the iterator index value because it was removing cards during the process to a few simple if statements and calls to the .filter method. 
-  </p>
+          <p>
+            The code above is bit much, but it will print to the console four times.
+            <ol>
+              <li>
+                On the initial rendering of the Header child based on the initial values of state, it will log "Upon child render, I am bored and hungry"
+              </li>
+              <li>
+                Once the div element is clicked, three sentence are logged to the console in rapid succession. On the click, the updateMyState function is called, which in turn calls our first call to setState(), which asynchronously stages an update to two of our state keys, switching myState from 'bored' to 'intrigued' and sleeping from 'true' to 'false'. This then re-renders the Header child, which causes the console to log the message "Upon child render, I am intrigued and hungry". This also changes the message in the header's div.
+              </li>
+              <li>
+                Once the Header has been rerendered (and all previously staged asynchronous processes have cleared), our setState method moves onto its callback function, this.updateMyAppetite. This function logs 'Between processes, I am intrigued and hungry' to the console. 
+              </li>
+              <li>
+                After checking the sleeping Boolean, updateMyAppetite calls another setState method that does in fact finally update the state's appetite value. Another rerender of the header causes another message to log to the console: 'Upon child render, I am intrigued and satiated'
+              </li>
+            </ol>
+          </p>
+      
+      <h4>Conclusion</h4>
 
-  <iframe src="https://giphy.com/embed/MhyiklmiG6iPK" width="480" height="480" frameBorder="0" class="giphy-embed" allowFullScreen style="display: block; margin-left: auto; margin-right: auto;"></iframe><p style='text-align: center;'><a href="https://giphy.com/gifs/kermit-the-frog-MhyiklmiG6iPK">via GIPHY</a></p>
-
-  <h4>Conclusion</h4>
-
-  <p>
-    The for-loop is mostly dead, having been replaced by methods that are either more dynamic like the ones demonstrated here or by more advanced loops (for..in has the ability to pull index values). It's only a few strange cases where a traditional for-loop still makes sense to use on an array, such as when we want to start iterating over the array at an index value after 0, but there are usually even work-arounds in those situations. For very large datasets and depending on the browser, a for-loop <em>might</em> actually iterate more quickly than its most direct sibling, ForEach, but the results there are mixed.
-  </p>
-
-  <p>
-    Additionally, for-loops are pretty awful at handling edge cases such as empty, undefined, or null values in arrays, while Javascript's built-in iterators usually account for those cases. The use of iterators results in shorter, sharper, and understandable code.
-  </p> -->
+      <p>
+        With so many components being constructed, rendered, mounted, and unmounted in a React website, there really is no choice but to set processes up asynchronously. This allows React websites to handle a multitude of event listeners, check for available screenspace, adjust for different browsers, and update the screen dynamically all while keeping the number of component rerenders to a minimum. While updating State values directly is not advised, React provides a number of times during the component lifecycle that state can be updated, in addition to user interaction via event listeners.
+      </p>
 
 
     </section>
