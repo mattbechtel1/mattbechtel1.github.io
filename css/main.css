@@ -35,9 +35,17 @@ body {
     line-height: 1
 }
 
-ol, ul {
+ul {
     list-style: circle;
    padding-bottom: 10px;
+}
+
+ol {
+    list-style-type: decimal;
+}
+
+li {
+    padding-bottom: 9px;
 }
 
 blockquote, q {
@@ -192,7 +200,7 @@ q {
 q:before {
     content: open-quote
 }
-
+    
 q:after {
     content: close-quote
 }
