@@ -61,17 +61,17 @@
         </p>
 
         <p>
-          One datatype that I have found useful for implementation is the <em>enum</em> type. Enums present yet another way to for a data architect to store values that have a limited number of potential options. By setting your accepted values for a column in advance, you have built in some validations, signified to other developers what options are acceptable for the column, and nicely cleaned parts of your data structure.
+          One data type that I have found useful for implementation is the <em>enum</em> type. Enums present yet another way to for a data architect to store values that have a limited number of potential options. By setting your accepted values for a column in advance, you have built in some validations, signified to other developers what options are acceptable for the column, and nicely cleaned parts of your data structure.
         </p>
         
         <p>
-          Before getting too far into enums, it is approprate to look at what other options are available to those not ready to make the plunge.
+          Before getting too far into enums, it is appropriate to look at what other options are available to those not ready to make the plunge.
             <ol type="1">
               <li>
-                <strong>Boolean</strong>: If your options can be summed up as a simple or-else condition with only two potential values, a boolean often makes sense, particuarly if your logic can be reasoned linguistically as 'my-instance-is-in-this-state-or-not'. Problems can however arise when we mix trues and falses with NULLs, since both false and NULL will be declared 'falsy' by most coding languages.
+                <strong>Boolean</strong>: If your options can be summed up as a simple or-else condition with only two potential values, a boolean often makes sense, particularly if your logic can be reasoned linguistically as 'my-instance-is-in-this-state-or-not'. Problems can however arise when we mix trues and falses with NULLs, since both false and NULL will be declared 'falsy' by most coding languages.
               </li>
               <li>
-                <strong>String</strong>: Another option to develop a multiple choice field for your database is to only provide a limited number of specific values. While this works closest to what enumerables will do, there a number of extra steps involved. Notably, you will likely have to provide at least one custom validation for your instances that may require quite a bit of typing. You also lose much of the built-in logic that comes with the boolean type of data, since all strings will evaluate to truthy.
+                <strong>String</strong>: Another option to develop a multiple choice field for your database is to only provide a limited number of specific values. While this works closest to how an enumerated data type will, there a number of extra steps involved. Notably, you will likely have to provide at least one custom validation for your instances that may require quite a bit of typing. You also lose much of the built-in logic that comes with the boolean type of data, since all strings  evaluate to truthy.
               </li>
               <li>
                 <strong>Join Table</strong>: You could give your option values their own table in the database and utilize foreign keys to connect one with your instance. This is probably the preferred method if your options will need other data associated with them and you plan to nest other models of your options. Rails will also build in some of the logic, allowing you to quickly and easily get all instances with one option without having to building your own search query or enumerator method, for example. However, if you are not building more data off your options, it can lead to deeper nesting in your data serializers than you would otherwise have.
@@ -163,7 +163,7 @@ puts tran2.settled? # => false
         
 
           <p>
-              We can use both the question mark to determine whether the transaction status matches and the exclamation mark to forceably change the transaction's status in our database. We can use both symbols and strings to set or reset the values. If we wanted to, we could even use an integer if we were to memorize each index position that we initially put into our transaction model.
+              We can use both the question mark to determine whether the transaction status matches and the exclamation mark to forcibly change the transaction's status in our database. We can use both symbols and strings to set or reset the values. If we wanted to, we could even use an integer if we were to memorize each index position that we initially put into our transaction model.
           </p>
 
 
@@ -180,98 +180,68 @@ puts tran2.settled? # => false
 
 <pre class="prettyprint lang=rb">
     <code>
-class AddStatusToTransactions < ActiveRecord::Migration[6.0]
-    def change
-        create_table :transactions do |t|
-            t.float :amount
-            t.datetime :trans_date
-            t.integer :status
-            t.integer :trans_type
-            t.string :notes
-            t.references :account, null: false, foreign_key: true
-
-            t.timestamps
-        end
-    end
-end
-
+class Transaction < ApplicationRecord
+    belongs_to :account
+    enum status: {refunded: 3, pending: 0, settled: 1, rejected: 2}
+    enum trans_type: {debit: 0, credit: 1}
     </code>
 </pre>
 
           <p>
-              It certainly feels a bit hacky, but it solves our problem (and kind of represents the seeming randomness of credit card transaction codes anyway.) Getting Postgresql to sync is a bit more out there, though. We should probably do a separate migration for this column.
+              It certainly feels a bit hacky, but it solves our problem (and kind of represents the seeming randomness of credit card transaction codes anyway.) Getting Postgresql to sync is a bit more out there, though, requiring us to more directly fire the SQL command rather than rely on ActiveRecrd. We should probably create a separate migration for this column.
           </p>
 
 <pre class="prettyprint lang=rb">
 <code>
-class Transaction < ApplicationRecord
-belongs_to :account
-enum status: {refunded: 3, pending: 0, settled: 1, rejected: 2}
-enum trans_type: {debit: 0, credit: 1}
+class AddStatusToTransactions < ActiveRecord::Migration[6.0]
+    def up
+        execute <<-SQL
+            CREATE_TYPE transaction_status AS ENUM ('refunded', 'pending', 'settled', 'rejected')
+        SQL
+        add_column :transactions, :status, :transaction_status
+    end
+
+    def down
+        remove_column :transactions, :status
+        execute <<-SQL
+            DROP TYPE transaction_status
+        SQL
+    end
+end
 </code>
 </pre>
 
+    <p>
+        There's a lot going on there, but basically we are creating our own data type called transaction status as an enum inside the database. We are then adding a column that will take accept that data type, instead of an integer or boolean or some other standard data type.
+    </p>
 
-  <pre class="prettyprint lang=js">
+    <p>
+        As a final step, we can completely get rid of the integers in our model and replace them with strings equal to the keys:
+    </p>
+
+<pre class="prettyprint lang=rb">
     <code>
-import React from 'react'
-import Header from './Header'
-
-export default class Applet extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            myState: 'bored',
-            myAppetite: 'hungry',
-            sleeping: true
-         }
-    }
-
-    updateMyState = () => { 
-        this.setState({
-            myState: 'intrigued',
-            sleeping: false
-        }, this.updateMyAppetite)
-    }
-
-    updateMyAppetite = () => {
-        const {sleeping, myAppetite, myState} = this.state
-        console.log("Between processes, I am", myState, "and", myAppetite)
-
-        if (!sleeping) {
-            this.setState({myAppetite: 'satiated'})
-        }
-    }
-
-    render() {
-        return (
-            >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
-                >Header passedState={this.state} />
-            >div>
-    )}
-}
-
-// Header.js
-
-import React from 'react'
-
-class Header extends React.Component {
-	render() {
-		console.log('Upon child render, I am', this.props.passedState.myState, 'and' this.props.passedState.myAppetite)
-		return >div>
-			>div>My State is {this.props.passedState.myState} >/div>
-		>/div>
-	}
-}
-
-export default Header
+class Transaction < ApplicationRecord
+    belongs_to :account
+    enum status: {refunded: 'refunded', pending: 'pending', settled: 'settled', rejected: 'rejected'}
     </code>
-  </pre>
-      
+</pre>
+
+    <p>
+        We lose the ability to update the status using integers in our ruby files and rails console, but we gain the ability to query using ActiveRecord's '?' syntax: 
+    </p>
+
+<pre class="prettyprint lang=rb">
+    <code>
+(Transaction.where{'status = ?', 'pending'}) # => only available once we match Postgresql up with our model.
+    </code>
+</pre>
+    </p>
+
       <h4>Conclusion</h4>
 
       <p>
-        With so many components being constructed, rendered, mounted, and unmounted in a React website, there really is no choice but to set processes up asynchronously. This allows React websites to handle a multitude of event listeners, check for available screenspace, adjust for different browsers, and update the screen dynamically all while keeping the number of component rerenders to a minimum. While updating State values directly is not advised, React provides a number of times during the component lifecycle that state can be updated, in addition to user interaction via event listeners.
+          Moving beyond standard data gives us flexibility to define our own data types. In a case where we have limited,but multiple options for a database column, utilizing Rails and Postgresql's enum option provides access to rails-based methods to create, seed, edit, and query our databases using only ruby.
       </p>
 
 
@@ -279,11 +249,11 @@ export default Header
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=Reacting to the Async State&amp;url=http://mattbechtel1.github.io/posts/react-set-async-state&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+        <a href="http://twitter.com/share?text=Using_Enumerated_Data_Types_in_Postgresql_and_Rails&amp;url=http://mattbechtel1.github.io/posts/postgresql-enums&amp;hashtags=web,dev,blog,soudev"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/react-set-async-state"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/postgresql-enums"
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -296,8 +266,8 @@ export default Header
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/javascript-iterators';
-        var disqus_title = 'Asynchronous State in React';
+        var disqus_identifier = '/postgresql-enums';
+        var disqus_title = 'Beyond True & False: Enumerated Data Types in Postgresql & Rails';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
