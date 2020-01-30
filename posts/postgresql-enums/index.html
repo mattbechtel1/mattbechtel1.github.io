@@ -186,7 +186,7 @@ puts tran2.settled? # => false
     <code>
 class Transaction < ApplicationRecord
     belongs_to :account
-    enum status: {refunded: 3, pending: 0, settled: 1, rejected: 2}
+    enum status: {refunded: 3000, pending: 0, settled: 1, rejected: 2}
     enum trans_type: {debit: 0, credit: 1}
     </code>
 </pre>
