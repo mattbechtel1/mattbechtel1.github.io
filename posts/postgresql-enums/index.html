@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> Beyond True & False: Enumerated Data Types in Postgresql & Rails | Hello, World extended </title>
+  <title> Beyond True & False: Enumerated Data Types in Rails & Postgresql | Hello, World extended </title>
   <meta name="description" content="Using the Enumerated Data Type in Postgresql & Rails">
   <meta name="keywords" content="rails, postgresql, enumerated">
   <link rel="stylesheet" href="/css/main.css">
@@ -69,9 +69,11 @@
             <ol type="1">
               <li>
                 <strong>Boolean</strong>: If your options can be summed up as a simple or-else condition with only two potential values, a boolean often makes sense, particularly if your logic can be reasoned linguistically as 'my-instance-is-in-this-state-or-not'. Problems can however arise when we mix trues and falses with NULLs, since both false and NULL will be declared 'falsy' by most coding languages.
+                <img src='https://media.giphy.com/media/26tk0OUyKYpGd6zbG/giphy.gif' alt="true or false" style="display: block; margin-left: auto; margin-right: auto;">
               </li>
               <li>
                 <strong>String</strong>: Another option to develop a multiple choice field for your database is to only provide a limited number of specific values. While this works closest to how an enumerated data type will, there a number of extra steps involved. Notably, you will likely have to provide at least one custom validation for your instances that may require quite a bit of typing. You also lose much of the built-in logic that comes with the boolean type of data, since all strings  evaluate to truthy.
+                <img src='https://media.giphy.com/media/3o6nUNCph1w9w09hAc/giphy.gif' alt="Strings are not alright" style="display: block; margin-left: auto; margin-right: auto;">
               </li>
               <li>
                 <strong>Join Table</strong>: You could give your option values their own table in the database and utilize foreign keys to connect one with your instance. This is probably the preferred method if your options will need other data associated with them and you plan to nest other models of your options. Rails will also build in some of the logic, allowing you to quickly and easily get all instances with one option without having to building your own search query or enumerator method, for example. However, if you are not building more data off your options, it can lead to deeper nesting in your data serializers than you would otherwise have.
@@ -172,6 +174,8 @@ puts tran2.settled? # => false
         <p>
             Having all these options to change our transaction's status helps in manipulation, but we are still in the end using an array. If we were to add more and more status options or transaction types to our array later... for example, adding a refund status or type... we could continuously add values to our array, but be stuck with our original order. Furthermore, we have not actually told Postgresql that we want to use its enum feature yet. We are still just giving it integers. If we were to directly query for data in SQL rather than through ActiveRecord, we would see numbers only.
         </p>
+        
+        <img src='https://media.giphy.com/media/d3mmdNnW5hkoUxTG/giphy.gif' alt="so many credit card transaction types" style="display: block; margin-left: auto; margin-right: auto;">
 
           <p>
             If we do not really need to access Postgresql directly and are comfortable letting ActiveRecord do the heavy lifting, we can covert our original array into a hash with values of integers:
