@@ -200,7 +200,7 @@ class Transaction < ApplicationRecord
 class AddStatusToTransactions < ActiveRecord::Migration[6.0]
     def up
         execute <<-SQL
-            CREATE_TYPE transaction_status AS ENUM ('refunded', 'pending', 'settled', 'rejected')
+            CREATE TYPE transaction_status AS ENUM ('refunded', 'pending', 'settled', 'rejected')
         SQL
         add_column :transactions, :status, :transaction_status
     end
