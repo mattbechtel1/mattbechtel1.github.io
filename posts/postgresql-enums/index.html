@@ -13,7 +13,7 @@
   <meta name="MobileOptimized" content="320">
   <meta name="theme-color" content="#2ecc71">
   <script
-    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js&lang=ruby"
+    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js&lang=rb"
     defer=""></script>
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -82,151 +82,135 @@
         <h4>Setting Up Your Postgresql Database in Rails to Accept An Enumerated Data Type</h4>
 
         <p>
-          In exploring the enumerated data type (henceforth, 'enum') of Postgresql for the first time (alongside the uuid data type, which is a blog for another day), I made frequent use of other blogs and stack overflow posts that delivered step-by-step instructions.
+          In exploring the enumerated data type (henceforth, 'enum') of Postgresql for the first time (alongside the uuid data type, which is a blog for another day), I made frequent use of other blogs and stack overflow posts that delivered step-by-step instructions. Most of them, frankly, contained a number of unnecessary steps.
         </p>
 
         <p>
-          Changing state in React, on the other hand, does not necessarily require sending a request to a server, just the DOM. The advantage of calling <strong>setState</strong> asynchronously is that React can batch multiple updates. An application with many components will likely have event handlers on multiple components that will call <strong>setState</strong>. If a parent and child components both call setState from the same click event, React will batch the two calls together, which avoids re-rendering components twice. This can only be completed asynchronously.
+            The step that cannot be overlooked, because, well, I overlooked it the first time I tried to use enums and I had a hell of time figuring out the problem, is to <strong>set up your rails project to use Postgresql</strong> instead of the default database. That's `rails new |project-name| --database=postgresql`. 
         </p>
 
         <p>
-          Below is an example of a duel call to <strong>setState</strong>. Both the parent (Applet) and child (Header) div are listening for clicks and are programmed to change the same state attribute. 
+          Once you have your models ready, you can add an enum option either when you develop the rails database migration that creates the table or a migration that adds a column to the table.
         </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint lang=rb">
     <code>
-import React from 'react'
-import Header from './Header'
+class CreateTransactions < ActiveRecord::Migration[6.0]
+    def change
+        create_table :transactions do |t|
+            t.float :amount
+            t.datetime :trans_date
+            t.integer :status
+            t.integer :trans_type
+            t.string :notes
+            t.references :account, null: false, foreign_key: true
 
-export default class Applet extends React.Component {
-  constructor() {
-      super()
-      this.state = {
-          myState: 'bored' }
-  }
-
-  updateMyState = () => {
-      this.setState({myState: 'hungry'})
-  }
-
-  updateMyStateFromChild= () => {
-      this.setState({myState: 'intrigued'})
-      }
-
-  render() {
-      console.log(this.state.myState) // logs 'bored' to console at initial render, then 'hungry' on subsequent clicks
-      return (
-          >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
-              >Header passedState={this.state} passedMethod={this.updateMyStateFromChild} />
-          >/div>
-  )}
-}
-
-// Header.js
-import React from 'react'
-
-class Header extends React.Component {
-	
-	render() {
-		// console.log(this.props.myState)
-		return >div onClick={this.props.passedMethod}>
-			>div>My State is {this.props.passedState.myState}>/div> //displays state as bored on initial render, and then hungry after other clicks.
-		>div>
-	}
-}
-
-export default Header
+            t.timestamps
+        end
+    end
+end
     </code>
   </pre>
 
           <p>
-            While we cannot witness a state change to the value of 'intrigued' with this code, the applet does not break and React manages the handle the state change with ease.
+            In the migration above, we set up our transactions table to have two enum fields: status and trans_type. Note that ActiveRecord needs to be told these are integers. When we set up our enums for the first time in our model, that will be prepared in an array, and Postgresql will need to know those indexes to identify what options are available.
           </p>
 
-          <p>
-            But, what if we don't use <strong>setState()</strong> in this dual situation? What if we try to set things with our old friend, '=' ?
-          </p>
-
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint lang=rb">
     <code>
-import React from 'react'
-import Header from './Header'
-
-export default class Applet extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            myState: 'bored' }
-    }
-
-    updateMyState = () => { 
-        this.state.myState = 'hungry'
-        console.log(this.state.myState)
-    }
-
-    updateMyStateFromChild= () => { 
-        this.state.myState = 'intrigued'
-        console.log(this.state.myState)    
-    }
-
-    render() {
-        console.log(this.state.myState) // logs 'bored' to console at initial render, then both 'hungry' and 'intrigued' on subsequent clicks
-        return (
-            >div onClick={this.updateMyState} style={{backgroundColor: 'yellow'}}>
-                >Header passedState={this.state} passedMethod={this.updateMyStateFromChild} />
-            >/div>
-    )}
-}
-
-
-// Header.js
-import React from 'react'
-
-class Header extends React.Component {
-	
-	render() {
-		return >div onClick={this.props.passedMethod}>
-			>div>My State is {this.props.passedState.myState}>/div> //displays state as bored on initial render, and does not change with the clicks.
-		>div>
-	}
-}
+class Transaction < ApplicationRecord
+    belongs_to :account 
+    enum status: [:pending, :settled, :rejected]
+    enum trans_type: [:debit, :credit]
     </code>
   </pre>
 
           <p>
-            While setState() will automatically fire off processes to rerender our affected components, simply reassigning our state, does not cause anything to change on the DOM.
+              And that's it for the basic set-up. Our transaction model is ready to accept values of only the limited number of options we have provided. On top of that, our rails app has access to logic that could not be afforded to strings. Upon seeding our transactions table: 
           </p>
+
+<pre class="prettyprint lang=rb">
+    <code>
+base_account = Account.find(1)
+trans1 = Transaction.create(
+    amount: 50.87, 
+    trans_date: Date.today, 
+    notes: 'gas bill', 
+    status: :settled, t
+    trans_type: :debit, 
+    account: base_account)
+trans2 = Transaction.create(
+    amount: 16.95, 
+    trans_date: 
+    Date.today, 
+    notes: 'dry cleaners', 
+    status: :pending, 
+    trans_type: :debit,
+    account: base_account)
+
+puts trans1.pending? # => false
+puts trans2.pending? # => true
+
+trans2.status = 'settled'
+puts trans2.pending? # => false
+puts Transaction.where(status: 'settled').count # => 2
+
+trans2.pending!
+puts trans2.pending? # => true
+puts tran2.settled? # => false
+    </code>
+</pre>
+        
 
           <p>
-            Interestingly enough, if we were to call our parent class's render method from within our state changing method. And when we do, the console.log() in the method will log our updated state value, but the child component will still not rerender on the DOM with the updated state value. (It is being returned to our update method, not the React parent component.)
-          </p>
-
-          <p>
-            By compiling multiple requests of setState before changing the state, React is also able to edit multiple components in one go, which improves performance.
+              We can use both the question mark to determine whether the transaction status matches and the exclamation mark to forceably change the transaction's status in our database. We can use both symbols and strings to set or reset the values. If we wanted to, we could even use an integer if we were to memorize each index position that we initially put into our transaction model.
           </p>
 
 
-        <h4>SetState in the Component Lifecycle</h4>
+        <h4>Preparing for Enumerable Expansion</h4>
         
         <p>
-          The setState() method is only available at certain parts of the component lifecycle. While it is not technically available in the constructor() method, <strong>this.state</strong> can be set equal to a JavaScript object to provide the component's state with initial values. 
+            Having all these options to change our transaction's status helps in manipulation, but we are still in the end using an array. If we were to add more and more status options or transaction types to our array later... for example, adding a refund status or type... we could continuously add values to our array, but be stuck with our original order. Furthermore, we have not actually told Postgresql that we want to use its enum feature yet. We are still just giving it integers. If we were to directly query for data in SQL rather than through ActiveRecord, we would see numbers only.
         </p>
 
           <p>
-            As we discovered earlier, setState() is not really available during the render() due to stack overflow from infinite recursion. SetState() is available during the ComponentDidMount() phase.
+            If we do not really need to access Postgresql directly and are comfortable letting ActiveRecord do the heavy lifting, we can covert our original array into a hash with values of integers:
           </p>
 
-          <p>
-            While calling setState() in ComponentDidMount() will trigger additional rendering, it occurs before React updates the screen, so the user experience is largely unaffected. React's documentation suggests avoiding setState() here except for cases where the state may be dependent on screen measurement (for example, what space is available for modals), since almost everything else could be set in the constructor.
-          </p>
+
+<pre class="prettyprint lang=rb">
+    <code>
+class AddStatusToTransactions < ActiveRecord::Migration[6.0]
+    def change
+        create_table :transactions do |t|
+            t.float :amount
+            t.datetime :trans_date
+            t.integer :status
+            t.integer :trans_type
+            t.string :notes
+            t.references :account, null: false, foreign_key: true
+
+            t.timestamps
+        end
+    end
+end
+
+    </code>
+</pre>
 
           <p>
-            ComponentDidUpdate() also allows us to call setState(), which is highly sensible. However, the setState() call must be wrapped in a conditional statement to avoid an infinite loop.
+              It certainly feels a bit hacky, but it solves our problem (and kind of represents the seeming randomness of credit card transaction codes anyway.) Getting Postgresql to sync is a bit more out there, though. We should probably do a separate migration for this column.
           </p>
 
-          <p>
-            An alternative to calling setState() within ComponentDidUpdate() is to call it within... setState(). While our above examples only passed one argument (the update object) to the method, setState will also accept a second argument. The second argument is a callback function that will be fired once setState merges the first argument object with the existing state and rerenders the component. This method of updating, while not preferred by React's developers, more neatly mimics the call-and-response pattern used in API fetch requests. 
-          </p>
+<pre class="prettyprint lang=rb">
+<code>
+class Transaction < ApplicationRecord
+belongs_to :account
+enum status: {refunded: 3, pending: 0, settled: 1, rejected: 2}
+enum trans_type: {debit: 0, credit: 1}
+</code>
+</pre>
+
 
   <pre class="prettyprint lang=js">
     <code>
