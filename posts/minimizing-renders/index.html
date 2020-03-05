@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> 3 Tips to Minimize Renders in React | Hello, World extended </title>
+  <title> 3 Optimizations to Minimize Renders in React | Hello, World extended </title>
   <meta name="description" content="Asynchronous State in React">
   <meta name="keywords" content="ruby, module">
   <link rel="stylesheet" href="/css/main.css">
@@ -13,7 +13,7 @@
   <meta name="MobileOptimized" content="320">
   <meta name="theme-color" content="#2ecc71">
   <script
-    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js"
+    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js&lang=css"
     defer=""></script>
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -52,7 +52,7 @@
     <section class="main-content">
       <article class="post">
         <header class="post-header">
-          <h1 class="post-title">3 Tips to Minimize Rendering in React</h1>
+          <h1 class="post-title">3 Optimizations to Minimize Rendering in React</h1>
           <p class="post-meta">March 5, 2020</p>
         </header>
         <h4>Render Delays</h4>
@@ -62,7 +62,7 @@
         </p>
 
         <p>
-            Fortunately, refactoring to minimize rendering is usually easy (unless you did not use a store to manage state). Modern JavaScript, CSS optimization, and small components provide us with a vast set of tools to minimize our renders, improve the user experience, and actually make our code more readable. Here are three tricks I learned while building and refactoring the <a href='https://succotash-app.heroku.com' target='_blank'>Succotash app</a>.
+            Fortunately, refactoring to minimize rendering is usually easy if you were wise enough to use a store to manage state). Modern JavaScript, CSS optimization, and small components provide us with a vast set of tools to minimize our renders, improve the user experience, and actually make our code more readable. Here are three tricks I learned while building and refactoring the <a href='https://succotash-app.heroku.com' target='_blank'>Succotash app</a>.
         </p>
 
 
@@ -73,9 +73,9 @@
         </p>
 
         <p>
-            In a situation where we have multiple fetch requests that need to be made on the mounting our our application, we have four options: 
+            In a situation where we have multiple fetch requests that need to be made on the mounting our application, we have four options: 
             <ol>
-                <li>We can make two seperate fetch request orders synchronously in our code. Because of React's <a href='../react-set-async-state/' target='_blank'>asynchronous updates of state</a>, we do not have to worry about causing extra renders. But, and here's the rub, after which async request should we attach our request to end our loading state? For an app like Succotash, where one call is to log in our user requires our database to decode a token, we can fairly safely assume that the user-related fetch will take longer to process than the non-secure list grab. But if your app is making both a secure user-login request to your own API and a request to an outside API that may have its own verification time, which could also take longer or shorter depending on volume, the choice is not so clear cut.
+                <li>We can make two separate fetch request orders synchronously in our code. Because of React's <a href='../react-set-async-state/' target='_blank'>asynchronous updates of state</a>, we do not have to worry about causing extra renders. But, and here's the rub, after which async request should we attach our request to end our loading state? For an app like Succotash, where one call is to log in our user requires our database to decode a token, we can fairly safely assume that the user-related fetch will take longer to process than the non-secure list grab. But if your app is making both a secure user-login request to your own API and a request to an outside API that may have its own verification time, which could also take longer or shorter depending on volume, the choice is not so clear cut.
                     <br/>
                     In pseudo-code, this would look like:
 
@@ -126,7 +126,7 @@ componentDidMount() {
                 With this set-up, our page loaded in 3.47 seconds, but witnessed 5 renders: (preloading, loading, with the crowdsouced data but no user, end loading state, and finally with the user data). The chain does not even work in the order we would expect. The only difference is that our loader was called off before our user data was delivered to state, which is not ideal.
                 </li>
 
-                <li>JavaScript's <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all' target='_blank'>Promise.all()</a> sound like a likely scenario here, especially if you are not using a state store. (Succotash does.) You could then pass down the batched results to child components together, spliting them up in a lower component when necessary. In pseudo-code, our componentDidMount would look like: 
+                <li>JavaScript's <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all' target='_blank'>Promise.all()</a> sound like a likely scenario here, especially if you are not using a state store. (Succotash does.) You could then pass down the batched results to child components together, splitting them up in a lower component when necessary. In pseudo-code, our componentDidMount would look like: 
                 
 <pre class="prettyprint lang=js">
     <code>
@@ -135,7 +135,7 @@ componentDidMount() {
 
     Promise.all([
         fetch(userDataUrlWithHeader),
-        fetch(process.env.REACT_APP_DOMAIN + '/crops')
+        fetch(crowdsourcedDataUrl)
     ])
     .then(responses => {
         responses[0].json()
@@ -150,7 +150,7 @@ componentDidMount() {
 </pre>
 
     <br/>
-                This method is the least predictable. My tests of the component did not have the same rending order each time we loaded. Sometimes that user data was passed down before the crowdsourced data! And in all cases, the loader stopped before either the crowdsouced or user data came through. The timing was similarly all over the place. It was under 3 seconds a few times I tested, but other times it took nearly six seconds to load.
+                This option is the least predictable. My tests of the component did not even have the same rendering order each time we loaded. Sometimes that user data was passed down before the crowdsourced data! And in all cases, the loader stopped before either the crowdsourced or user data came through. The timing was similarly all over the place. It was under 3 seconds a few times I tested, but other times it took nearly six seconds to load.
                 </li>
 
                 <li>
@@ -212,11 +212,11 @@ export function setLoggedInState(initialState) {
           </p>
 
           <p>
-              The solution was to move the dialog box component down a level, so that the component holding the clickable image could take in no props from state. A new component was then nested inside the how-to page's image component, only passing the image url as a prop. That inner component then held the dialog box, which was mapped directly to state.
+              The solution was to move the dialog box component down a level, so that the component holding the clickable image could take in no props from state. A new component was then nested inside the how-to page's image component, only passing the image URL as a prop. That inner component then held the dialog box, which was mapped directly to state.
           </p>
 
           <p>
-              While in many cases, such a re-render would be barely noticable, images are extremely obvious when they need to re-render, so this trick can help manage components, as well as abbreviate some of your components' codebase.
+              While in many cases, such a re-render would be barely noticeable, images are extremely obvious when they need to re-render, so this trick can help manage components, as well as abbreviate some of your components' codebase.
           </p>
 
          
@@ -230,16 +230,48 @@ export function setLoggedInState(initialState) {
           The lazy solution is to put one reducer on the very top of the app, and load it at each fetch and unmount it once our promises resolve and our state updates. You could, of course, use tip #2 here to avoid extra renders. (Place a full-page loader in its own mini-component, but set it with full-page and z-index of -1 styling attributes.)
       </p>
 
+      <p>
+        For a slow-processing backend, however, this might be a little problematic from a UX perspective. Blocking an entire app for the sake of one component or unit is not an ideal set-up. The solution is to place a loader over just the component, rather than the entire page.
+      </p>
+
+      <p>
+        In Succotash, this solution is implemented in the deadline list component, visible on both the profile view and the field view. Replacing the entire component with a circular loader would result in a very jerky motion of the visible component when our backend is operating at ideal speeds, so that is an awful solution. Instead, I used a wrapper div with relative positioning for the component's root returned node and the circular progress component as one of its children. The CSS looks something like:
+      </p>
+
+<pre class="prettyprint lang=css">
+  <code>
+  /* class for div that is the root node of your container component */
+.wrapper {
+  position: relative
+}
+
+ /* class for the backdrop that contains your loader, usually a direct child of the wrapper above */
+.backdrop {
+  z-Index: -1,
+  color: '#fff',
+  position: 'absolute'
+}
+  </code>
+</pre>
+
+  <p>
+    As opposed to using a bumpy ternary expression to choose between two different components, this method allows us to keep both the progress and full exisiting list on the screen until whatever backend edit (either a new deadline, removed deadline, or edited deadline) is completed.
+  </p>
+
+  <p>
+    As far as rendering counts, props will change only twice for your wrapper component on an edit if you have set up your redux store and actions correctly. Once to bring the loader up, and once to both take the loader down and send the updated list through. Meanwhile, the rest of your app is still accessible and not hidden behind a dimmer and loader.
+  </p>
+
 
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=Reacting to the Async State&amp;url=http://mattbechtel1.github.io/posts/react-set-async-state&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+        <a href="http://twitter.com/share?text=3 Optimizations to Minimize Rendering in React&amp;url=http://mattbechtel1.github.io/posts/minimizing-renders&amp;hashtags=web,dev,blog,soudev"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/react-set-async-state"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/minimizing-renders
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -252,8 +284,8 @@ export function setLoggedInState(initialState) {
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/javascript-iterators';
-        var disqus_title = 'Asynchronous State in React';
+        var disqus_identifier = '/minimizing-renders';
+        var disqus_title = '3 Optimizations to Minimize Rendering in React';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
