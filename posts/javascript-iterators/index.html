@@ -12,9 +12,7 @@
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="theme-color" content="#2ecc71">
-  <script
-    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=rb"
-    defer=""></script>
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-52446115-1']);
@@ -83,7 +81,7 @@
             The for-loop the classic iterator. No need for a method call. Just a lot of ugly syntax that is completely unreadable to the uninitiated. The other methods I’ll mention here can all be distilled down to a for-loop as well, but those more complex methods are far more readable when called with their named methods. Still, the for loop remains the unchallenged champion for logging consecutive numbers into a console:
         </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       function counting() {
         let str = "";
@@ -106,7 +104,7 @@
             The most similar method would be the ForEach, which quite simply, like a for loop, executes a function for each element in an array, returning nothing.
           </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       const arr = [5, 6, 7, 8, 9, 10];
       function countingWithForEach(array) {
@@ -131,7 +129,7 @@
             The first iterator of interest is map, most useful when we are given an array of elements we wish to transform into an array of the same length, but with edited values. For example, we might have a list of names entered with all lowercase letters, but we wish to capitalize them. As a for loop, our map method to fix our array would look something like:
         </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       let beatles = ['john', 'paul', 'george', 'pete']
 
@@ -154,7 +152,7 @@
             Boy is that ugly, but it gets the job done! Of course, there's one other problem... While we appreciate 'pete's' time in our beatles array, he really does not fit it. We need to take him out and put 'ringo' in, then capitalize again.
           </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       let beatles = ['john', 'paul', 'george', 'pete']
       delete beatles[3]
@@ -183,7 +181,7 @@
             Enter the map iterator method:
           </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       let beatles = ['john', 'paul', 'george', 'pete']
       delete beatles[3]
@@ -229,7 +227,7 @@
     Excellent. Exactly, what we expected. A bit of a long route to get there, having to take time to initialize the loop function, the default empty string, and the index for our loop, in addition to the array. Upon closer look, someone put a 'splinter' in our list of Italian Renaissance Artists, and I don't think recall any Splinters being mentioned in art history class. Let's remove him and run it again.
   </p>
 
-  <pre class="prettyprint lang=js">
+  <pre class="prettyprint">
     <code>
       let renaissanceArtists = ['splinter', 'leonardo', 'raphael', 'michelangelo', 'donatello']
       delete renaissanceArtists[0]

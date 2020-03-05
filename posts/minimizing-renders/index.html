@@ -6,15 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title> 3 Optimizations to Minimize Renders in React | Hello, World extended </title>
-  <meta name="description" content="Asynchronous State in React">
+  <meta name="description" content="Minimize Rendering in React">
   <meta name="keywords" content="ruby, module">
   <link rel="stylesheet" href="/css/main.css">
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="theme-color" content="#2ecc71">
-  <script
-    src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst&lang=js&lang=css"
-    defer=""></script>
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-52446115-1']);
@@ -238,7 +236,7 @@ export function setLoggedInState(initialState) {
         In Succotash, this solution is implemented in the deadline list component, visible on both the profile view and the field view. Replacing the entire component with a circular loader would result in a very jerky motion of the visible component when our backend is operating at ideal speeds, so that is an awful solution. Instead, I used a wrapper div with relative positioning for the component's root returned node and the circular progress component as one of its children. The CSS looks something like:
       </p>
 
-<pre class="prettyprint lang=css">
+<pre class="prettyprint">
   <code>
   /* class for div that is the root node of your container component */
 .wrapper {
@@ -247,9 +245,9 @@ export function setLoggedInState(initialState) {
 
  /* class for the backdrop that contains your loader, usually a direct child of the wrapper above */
 .backdrop {
-  z-Index: -1,
-  color: '#fff',
-  position: 'absolute'
+  z-index: -1,
+  color: #fff,
+  position: absolute
 }
   </code>
 </pre>
