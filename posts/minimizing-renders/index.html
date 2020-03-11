@@ -67,13 +67,13 @@
         <h4>Optimization #1: Batch State Updates when Making Multiple Asynchronous Requests to your APIs</h4>
 
         <p>
-            I generally prefer to minimize backend fetches on the initial load of my applications that require user login by nesting data extremely deeply. Sometimes, however, you may have to fetch user data from your API and informational data from an external API, or, as was my case with Succotash, grab both data specific to the user and another set of data that was crowdsourced across the app's userbase.
+            I generally prefer to minimize backend fetches on the initial load of my applications that require user login by nesting data extremely deeply. Sometimes, however, you may have to fetch user data from your API and informational data from an external API, or, as was my case with Succotash, grab both data specific to the user and another set of data that was crowdsourced across the app's userbase from different backend routes.
         </p>
 
         <p>
             In a situation where we have multiple fetch requests that need to be made on the mounting our application, we have four options: 
             <ol>
-                <li>We can make two separate fetch request orders synchronously in our code. Because of React's <a href='../react-set-async-state/' target='_blank'>asynchronous updates of state</a>, we do not have to worry about causing extra renders. But, and here's the rub, after which async request should we attach our request to end our loading state? For an app like Succotash, where one call is to log in our user requires our database to decode a token, we can fairly safely assume that the user-related fetch will take longer to process than the non-secure list grab. But if your app is making both a secure user-login request to your own API and a request to an outside API that may have its own verification time, which could also take longer or shorter depending on volume, the choice is not so clear cut.
+                <li>We can make two separate fetch request orders synchronously in our code. This situation, however, will mean we are unable to take advantage of React's <a href='../react-set-async-state/' target='_blank'>asynchronous updates of state</a>. But after which async request should we attach our request to end our loading state? For an app like Succotash, where only one call requires our database to decode a JSON web token while the other call has a more accessible route, we can fairly safely assume that the user-related fetch will take longer to process than the non-secure list grab. But if your app is making both a secure user-login request to your own API and a request to an outside API that may have its own verification time, which could also take longer or shorter depending on volume, the choice is not so clear cut.
                     <br/>
                     In pseudo-code, this would look like:
 
@@ -95,7 +95,7 @@ componentDidMount() {
 }
     </code>
 </pre>
-                When I tried this type of request through the development version of Succotash on a localhost, the full page load took 3.49 seconds, and my render hook was hit five times (preloading, loading state, deliver crowdsourced data, deliver user data, end loading state).</li>
+                When I tried this type of request through the development version of Succotash on localhost servers, the full page load took 3.49 seconds, and my render hook was hit five times (preloading, loading state, deliver crowdsourced data, deliver user data, end loading state).</li>
 
                 <li>We can chain our asynchronous fetch requests, so that the second only starts once the first one ends. That will also allow us to securely end our loader at the end of the chain. Again with pseudo-code:
 
@@ -108,23 +108,24 @@ componentDidMount() {
     .then(userData => userData.json())
     .then(user => {
         putUserInState(user)
+        return Promise.resolve(true)
     })
-    .then(
-        fetch(crowdsourcedDataUrl)
-        .then(crowdsourcedData => crowdsourcedData.json())
-        .then(data => {
-            putCrowdsourcedDatainState(data)
-            endPageLoader()
-        })
-    )
+    .then(() => {
+      fetch(crowdsourcedDataUrl)
+      .then(crowdsourcedData => crowdsourcedData.json())
+      .then(data => {
+        putCrowdsourcedDatainState(data)
+        endPageLoader()
+      })
+    })
 }
     </code>
 </pre>
     <br />
-                With this set-up, our page loaded in 3.47 seconds, but witnessed 5 renders: (preloading, loading, with the crowdsouced data but no user, end loading state, and finally with the user data). The chain does not even work in the order we would expect. The only difference is that our loader was called off before our user data was delivered to state, which is not ideal.
+                With this set-up, our page generally loaded anywhere between 3.1 and 4.5 seconds on a localhost, but we witnessed 5 renders: (preloading, loading, with the user but no crowdsouced data, end with both the user and crowdsourced data, and finally without the loaded).
                 </li>
 
-                <li>JavaScript's <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all' target='_blank'>Promise.all()</a> sound like a likely scenario here, especially if you are not using a state store. (Succotash does.) You could then pass down the batched results to child components together, splitting them up in a lower component when necessary. In pseudo-code, our componentDidMount would look like: 
+                <li>JavaScript's <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all' target='_blank'>Promise.all()</a> sound like a likely savior here, especially if you are not using a state store. (Succotash does.) You could then pass down the batched results to child components together, splitting them up in a lower component when necessary. In pseudo-code, our componentDidMount would look like: 
                 
 <pre class="prettyprint lang=js">
     <code>
@@ -141,14 +142,16 @@ componentDidMount() {
         
         responses[1].json()
         .then(putCrowdsourcedDatainState)
+
+        return Promise.resolve()
     })
-    .then(endPageLoader)
+    .then(() => endPageLoader())
 }
     </code>
 </pre>
 
     <br/>
-                This option is the least predictable. My tests of the component did not even have the same rendering order each time we loaded. Sometimes that user data was passed down before the crowdsourced data! And in all cases, the loader stopped before either the crowdsourced or user data came through. The timing was similarly all over the place. It was under 3 seconds a few times I tested, but other times it took nearly six seconds to load.
+                This option is the quickest yet, but comes with its own host of problems. Most of my tests showed a page load of under 3 seconds, albeit with 5 renders. But take a look at the code. The promise is returned before the asynchrounous updates conclude, which means the loader disappears before the fetched data is rendered. Of the user data and crowdsourced data, sometimes the user data would render first, while in other instances it was the crowdsourced data. This unpredictability is not good. In all cases, the loader stopped before either the crowdsourced or user data came through. Oftentimes, the console would also display a violation warning: 'Forced reflow while executing JavaScript took 41ms.' While quick, the loader disappearing before the server concludes its tasks is a no-go and would confuse the user if there was a problem with the server.
                 </li>
 
                 <li>
