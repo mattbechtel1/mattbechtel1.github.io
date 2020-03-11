@@ -196,7 +196,7 @@ export function setLoggedInState(initialState) {
 </pre>
     <br />
 
-                This cuts our rendering count down to only three (pre-loading, loading, and everything updated in state). Like our other Promise.all() option, the load time varies greatly, with some really long load times, but we average less than the both the synchronous and chained fetch options. We also see the loader disappear at the same time our data appears -- not before, like our other options.
+                This cuts our rendering count down to only three (pre-loading, loading, and everything updated in state). Like our other Promise.all() option, the load time varies greatly, with some really long load times, but we average less than the both the synchronous and chained fetch options. We also see the loader disappear at the same time our data appears -- not before.
 
                 </li>
             </ol>
@@ -256,7 +256,7 @@ export function setLoggedInState(initialState) {
 </pre>
 
   <p>
-    As opposed to using a bumpy ternary expression to choose between two different components, this method allows us to keep both the progress and full exisiting list on the screen until whatever backend edit (either a new deadline, removed deadline, or edited deadline) is completed.
+    As opposed to using a bumpy ternary expression to choose between two different components, this method allows us to keep both the progress and full existing list on the screen until whatever backend edit (either a new deadline, removed deadline, or edited deadline) is completed.
   </p>
 
   <p>
