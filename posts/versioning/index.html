@@ -56,7 +56,7 @@
         <h4>Why Do We Declare Versions for Our Apps?</h4>
         
         <p>
-            You have just built a stable version of your app. You are incredibly proud of your work, you have deployed to a cloud platform, and intend to continue to develop it. It has been your intention the entire time to continuously integrate and continously develop the app.
+            You have just built a stable version of your app. You are incredibly proud of your work, you have deployed to a cloud platform, and intend to continue to develop it. It has been your intention the entire time to continuously integrate and continuously develop the app.
         </p>
 
         <p>
@@ -87,7 +87,7 @@
         </p>
 
         <p>
-            A PATCH version is a release with only minor feature tweaks, front-end or code styling updates that do not change any routing, bumping your own app's dependancies, so long as those patches do not change the API.
+            A PATCH version is a release with only minor feature tweaks, front-end or code styling updates that do not change any routing, bumping your own app's dependencies, so long as those patches do not change the API.
         </p>
 
         <p>
@@ -104,7 +104,7 @@
   
         <ul>
             <li>
-                MAJOR version updates should virtually never occur. Only depreciating major features or major overhauls of my backend API would necessitate the need for a major version update. Since I am not releasing products to market at this time, and everything is hosted on the web, I have the freedom to continuously develop and integrate systems, and, if anything, I am not going to harm users by necessitating the creating of new accounts or purchase new softwares just to use my app. Migrations to new web-servers might count as a major version change if it requires changes to some URIs.
+                MAJOR version updates should virtually never occur. Only depreciating major features or major overhauls of my backend API would necessitate the need for a major version update. Since I am not releasing products to market at this time, and everything is hosted on the web, I have the freedom to continuously develop and integrate systems, and, if anything, I am not going to harm users by necessitating the creating of new accounts or purchase new software just to use my app. Migrations to new web-servers might count as a major version change if it requires changes to some URIs.
             </li>
   
             <li>
@@ -112,22 +112,22 @@
             </li>
   
             <li>
-                PATCH versions, therefore, are everything else. Bumping a dependancy, styling updates, and new features that are limited to the frontend would all fall under the category of patch updates. That is, of course, in addition to simple bug fixes meant to bring an app up to date with what is already in its documentation.
+                PATCH versions, therefore, are everything else. Bumping a dependency, styling updates, and new features that are limited to the frontend would all fall under the category of patch updates. That is, of course, in addition to simple bug fixes meant to bring an app up to date with what is already in its documentation.
             </li>
         </ul>
   
         <h5>CLI Applications</h5>
   
         <li>
-          MAJOR version updates for CLIs should, likewise, be avoided until absolutely necessary. Users have a tendancy to memorize commands into muscle memory, so an major update can actually be more disruptive than even a complete overhaul of a frontend website. For my apps, I would only release a new major version if I was requiring users to install (usually others') additional software for continued use of my application.
+          MAJOR version updates for CLIs should, likewise, be avoided until absolutely necessary. Users have a tendency to commit commands into muscle memory, so a major update to a CLI application can actually be more disruptive than even a complete overhaul of a frontend website. For my apps, I would only release a new major version if I was requiring users to install (usually others') additional software for continued use of my application.
         </li>
   
         <li>
-            MINOR version updates for CLI applications would include significant, but not disruptive, feature rollouts. If our application fetchs from a backend server and we have expanded our backend with new routes or table columns, that would require new API documentation and, therfore, a new minor version release.
+            MINOR version updates for CLI applications would include significant, but not disruptive, feature rollouts. If our application fetches from a backend server and we have expanded our backend with new routes or table columns, that would require new API documentation and, therefore, a new minor version release.
         </li>
   
         <li>
-            PATCH versions are anything else: bug fixes, better --help documentation, improved menus, features increasing security, and bumping dependancies.
+            PATCH versions are anything else: bug fixes, better --help documentation, improved menus, features increasing security, and bumping dependencies.
         </li>
 
         <h4>Documenting Versions with Github</h4>
@@ -137,7 +137,7 @@
         </p>
 
         <p>
-            Hosting sites, such as Heroku, include version counts for each push, but that is almost always not useful, since it increments only major versions and you may only learn something is unstable (backend-frontend connections, CORS settings, initializers, etc.) once deployed, so using those version counts as gospel is almost never appropriate. And if you have both frontend and backend servers and view the entire app as your entity, they may not even be on the same hosting version.
+            Hosting sites, such as Heroku, include version counts for each push, but that is almost always not useful, since it increments only major versions and you may only learn something is unstable in the production build (backend-frontend connections, CORS settings, initializers, etc.) once deployed and make the redeployment patch immediately, so using those built-in version counts as gospel is almost never appropriate. And if you have both frontend and backend servers and view the entire app as your entity, they may not even be on the same hosting version.
         </p>
         
         <p>
