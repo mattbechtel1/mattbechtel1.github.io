@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 
 <head>
   <meta charset="utf-8">
@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title> A Beginner's Guide to Versioning Software | Hello, World extended </title>
   <meta name="description" content="Versioning Apps">
-  <meta name="keywords" content="ruby, module">
+  <meta name="keywords" content="github, versioning, software">
   <link rel="stylesheet" href="/css/main.css">
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
@@ -94,77 +94,79 @@
             The MINOR version number resets to 0 when a new MAJOR version is released. Likewise, the PATCH version number resets to 0 when a new MINOR or MAJOR version is released.
         </p>
 
-        <h4>Documenting Versions</h4>
+        <h4>Major, Minor, or Patch</h4>
+
+        <p>
+            As a beginning developer that has only a few deployed projects to my name, I largely control what I consider a major, minor, and patch updates. While Semantic Versioning has a few rules, this is largely how I plan to determine what constitutes a major, minor, and patch update:
+        </p>
+  
+        <h5>Full Stack Web-Hosted Applications with Dual Frontend and Backend Builds</h5>
+  
+        <ul>
+            <li>
+                MAJOR version updates should virtually never occur. Only depreciating major features or major overhauls of my backend API would necessitate the need for a major version update. Since I am not releasing products to market at this time, and everything is hosted on the web, I have the freedom to continuously develop and integrate systems, and, if anything, I am not going to harm users by necessitating the creating of new accounts or purchase new softwares just to use my app. Migrations to new web-servers might count as a major version change if it requires changes to some URIs.
+            </li>
+  
+            <li>
+                MINOR version updates will occur after well-planned, significant feature expansions that require extra documentation, new or adjusted backend routes, or complete overhauls of a large number of frontend routes. Other than the final remodeling option, minor version updates will always include some kind of backend restructuring, whether it be the creation of new database tables or additional columns to existing tables.
+            </li>
+  
+            <li>
+                PATCH versions, therefore, are everything else. Bumping a dependancy, styling updates, and new features that are limited to the frontend would all fall under the category of patch updates. That is, of course, in addition to simple bug fixes meant to bring an app up to date with what is already in its documentation.
+            </li>
+        </ul>
+  
+        <h5>CLI Applications</h5>
+  
+        <li>
+          MAJOR version updates for CLIs should, likewise, be avoided until absolutely necessary. Users have a tendancy to memorize commands into muscle memory, so an major update can actually be more disruptive than even a complete overhaul of a frontend website. For my apps, I would only release a new major version if I was requiring users to install (usually others') additional software for continued use of my application.
+        </li>
+  
+        <li>
+            MINOR version updates for CLI applications would include significant, but not disruptive, feature rollouts. If our application fetchs from a backend server and we have expanded our backend with new routes or table columns, that would require new API documentation and, therfore, a new minor version release.
+        </li>
+  
+        <li>
+            PATCH versions are anything else: bug fixes, better --help documentation, improved menus, features increasing security, and bumping dependancies.
+        </li>
+
+        <h4>Documenting Versions with Github</h4>
         
         <p>
-            Using state store management allows us to have entire components that need not view state. Static pages, like <a href='https://succotash-app.herokuapp.com/guide'>Succotash's how-to page</a>, are perfect examples of fairly large scale components that do not need to read from the store.
+            In some cases, it might be useful to developers to have a unique view on your front-end app devoted to version history or a similar display option on a command-line application. But generally, the most appropriate place for documenting versioning will be API documentation or a Readme.
+        </p>
+
+        <p>
+            Hosting sites, such as Heroku, include version counts for each push, but that is almost always not useful, since it increments only major versions and you may only learn something is unstable (backend-frontend connections, CORS settings, initializers, etc.) once deployed, so using those version counts as gospel is almost never appropriate. And if you have both frontend and backend servers and view the entire app as your entity, they may not even be on the same hosting version.
+        </p>
+        
+        <p>
+            For my active apps, I try to provide a unique version number to all deployed apps with unique code, excluding deployments that only last a small amount of time (usually because I didn't test, thoroughly. Someday, I'll learn that lesson). For apps with a frontend and backend working in unison, I match their version numbers to a given time. (Although, if I deploy an update only one end of the web app, I will only update the Github version on that side of the app. However, the next version number, regardless of backend or frontend, will increment the version of the most recently deployed side.)
         </p>
 
           <p>
-            The images on that page are another matter. For the feature that magnifies images when you click them, I needed to dispatch an action to the reducer that mounted the <a href='https://material-ui.com/components/dialogs/#dialog'>Material-UI dialog box</a> that held the larger image. Material's React dialog boxes take in a prop 'open', that, when true, mounts to the page. What I found when I passed my prop from state to the component (and also when I closed the dialog box) was that all the images on the page would go through a reload because of the updated prop received from the store.
+            If you store your code on Github, the answer is already built in. Since your Readme is available right up front, and it either links to or contains the API documentation, Github is also an excellent place to document your versions.
           </p>
 
           <p>
-              The solution was to move the dialog box component down a level, so that the component holding the clickable image could take in no props from state. A new component was then nested inside the how-to page's image component, only passing the image URL as a prop. That inner component then held the dialog box, which was mapped directly to state.
+              Assuming you follow the same deployment-then-version I do, after deployment, I switch over to Github. On your app's Github page, while the master (deployed) branch is the setting, click on the Release tab. If this is your first release of the app, there will be a button 'Create a new release' that you can click. If you've already saved a version, the button will say 'Draft a new release'.
           </p>
 
           <p>
-              While in many cases, such a re-render would be barely noticeable, images are extremely obvious when they need to re-render, so this trick can help manage components, as well as abbreviate some of your components' codebase.
+              From there, you can save your version name, title your release with <a href='https://turbofuture.com/cell-phones/Cupcake-Donut-Eclair-Froyo-Gingerbread-Honeycomb-Android-OS-Version-Codenames-and-Why' target='_blank'>some candy name</a> or something, and provide a description that briefly explains what is new in this version. Once published, developers will have access to a compressed folder containing all code pushed to Github for that moment of your master branch (or another branch of your choosing).
           </p>
 
-         
-      <h4>Optimization #3: Use Different Progress Loaders for Different Components</h4>
-
-      <p>
-          While it would be great for only a few select components to need state mapped to their props, in most apps, this is just not the case. And when props update with a connection to the backend, we need to use loaders to avoid some really buggy user experiences.
-      </p>
-
-      <p>
-          The lazy solution is to put one reducer on the very top of the app, and load it at each fetch and unmount it once our promises resolve and our state updates. You could, of course, use tip #2 here to avoid extra renders. (Place a full-page loader in its own mini-component, but set it with full-page and z-index of -1 styling attributes.)
-      </p>
-
-      <p>
-        For a slow-processing backend, however, this might be a little problematic from a UX perspective. Blocking an entire app for the sake of one component or unit is not an ideal set-up. The solution is to place a loader over just the component, rather than the entire page.
-      </p>
-
-      <p>
-        In Succotash, this solution is implemented in the deadline list component, visible on both the profile view and the field view. Replacing the entire component with a circular loader would result in a very jerky motion of the visible component when our backend is operating at ideal speeds, so that is an awful solution. Instead, I used a wrapper div with relative positioning for the component's root returned node and the circular progress component as one of its children. The CSS looks something like:
-      </p>
-
-<pre class="prettyprint">
-  <code>
-  /* class for div that is the root node of your container component */
-.wrapper {
-  position: relative
-}
-
- /* class for the backdrop that contains your loader, usually a direct child of the wrapper above */
-.backdrop {
-  z-index: -1,
-  color: #fff,
-  position: absolute
-}
-  </code>
-</pre>
-
-  <p>
-    As opposed to using a bumpy ternary expression to choose between two different components, this method allows us to keep both the progress and full existing list on the screen until whatever backend edit (either a new deadline, removed deadline, or edited deadline) is completed.
-  </p>
-
-  <p>
-    As far as rendering counts, props will change only twice for your wrapper component on an edit if you have set up your redux store and actions correctly. Once to bring the loader up, and once to both take the loader down and send the updated list through. Meanwhile, the rest of your app is still accessible and not hidden behind a dimmer and loader.
-  </p>
 
 
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=3 Optimizations to Minimize Rendering in React&amp;url=http://mattbechtel1.github.io/posts/minimizing-renders&amp;hashtags=web,dev,blog,soudev"
+        <a href="http://twitter.com/share?text=A Beginner's Guide To Versioning Software&amp;url=http://mattbechtel1.github.io/posts/versioning&amp;hashtags=web,dev,blog,soudev"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/minimizing-renders
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/versioning
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -177,8 +179,8 @@
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/minimizing-renders';
-        var disqus_title = '3 Optimizations to Minimize Rendering in React';
+        var disqus_identifier = '/versioning';
+        var disqus_title = "A Beginner's Guide to Versioning Software";
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
