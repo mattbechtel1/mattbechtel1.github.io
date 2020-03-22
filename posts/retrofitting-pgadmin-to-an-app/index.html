@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> The Invisible Elephant in the Room: Retrofitting pgAdmin to an App | Hello, World extended </title>
+  <meta name="description" content="Retrofitting pgAdmin">
+  <meta name="keywords" content="postgresql, pgadmin, applications">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">The Invisible Elephant in the Room: Retrofitting pgAdmin to an App</h1>
+          <p class="post-meta">March 22, 2020</p>
+        </header>
+        <h4>PostgreSQL: The Invisible Elephant</h4>
+        
+        <p>
+            Congrats! You have just finished building your first application that uses a Postgres database. Maybe you have even gotten around to deploying that app to Heroku or another cloud platform. Let's take a look at our database in the PostgreSQL12 program:
+        </p>
+
+        <img class="sideimage" src="../images/postgres-cl-screenshot.png" alt="PostgreSQL12 database queries use command line entry"
+        />
+
+        <p>
+            Command line SQL is not the best visualization when you want to browse your app's database. First, you, of course, have to learn or re-learn SQL, which you probably did not use much of in that app you built with a modern framework. Then, on top of that, you have to become proficient in <a href='https://www.postgresql.org/docs/12/app-psql.html' target='_blank'>psql</a> command line commands in order to even apply your SQL. Would it not be great 
+        </p>
+
+        <p>
+            It is time to take stock of your app and admit you made a mistake. You probably should have set up a modern database viewer at the beginning of your process. But all is not lost! You can easily retrofit PostgreSQL's standard database viewer and development platform, <a href='https://www.pgadmin.org/' target='_blank'>pgAdmin</a> to your already existing app. In this blog, I will explain how to retrofit pgAdmin for an app's development database and a production database deployed to Heroku. 
+        </p>
+
+        
+        <h4>Connecting pgAdmin to your Development Database</h4>
+        
+        <p>
+            Please note that these instructions are geared towards people using MacOS and pgAdmin4 with PostgreSQL12. Steps may be different for users of other operating systems or following major updates to pgAdmin and Postgres.
+        </p>
+        
+        <ol>
+            <li>
+                <p>
+                    First, we will want to make sure that we have pgAdmin4 installed on our machine. If you did not install pgAdmin at the same time you initially installed PostgreSQL, you can always go to the <a href='https://www.pgadmin.org/download/pgadmin-4-macos/' target='_blank'>pgAdmin4 download page</a> and install it. I found using homebrew and the command line to work just fine as well.
+                </p>
+                    
+                <pre class="prettyprint lang-bsh">
+<code>brew cask install pgadmin4</code>
+                </pre>
+
+            </li>
+            
+            <li>
+                <p>
+                    Once the installation is complete, you should be able launch pgAdmin4 from Finder's applications list. pgAdmin will launch in your browser. If this is your first time launching pgAdmin, you may be asked to set a password (and if it is not, you should be asked to provide that password.
+                </p>
+            </li>
+
+            <li>
+                <p>
+                    With pgAdmin working (although not 'doing' much), we need to get a couple of important pieces of information from PostgreSQL to proceed. Open Postgres. You can often find an elephant icon on the toolbar, but make sure you are choosing the Postgres elephant, and not the new icon for pgAdmin. If not, check for the app in Finder.
+                </p>
+
+                <p>
+                    The information we need to continue is found in server settings. We need the server name (the default is usually PostgreSQL and the major version number -- at the time of this writing, it is PostgreSQL 12.) We also need the port number. This usually defaults to 5432. 
+                </p>
+            </li>
+
+            <li>
+                <p>
+                    Returning to pgAdmin in your browser, there should be a tree pane on the left. You will want to right-click whatever is at the base of that tree and select the option that allows you to create a new Server Group. Provide it with whatever name you like. A name as simple as 'Applications' will work just fine.
+                </p>
+            </li>
+
+            <li>
+                <p>
+                    Now, right-click that server group you just created and select the option that allows you to create a Server. A dialog box should open up.
+                </p>
+
+                <p>
+                    On the General pane, provide your server with a name. Again, any simple name will do.
+                </p>
+
+                <p>
+                    Switching over to the Connection pane, provide a host name/address. In this case, it should match the IP address in your URL bar. Usually, this will be `127.0.0.1`. Make sure the port number matches what the port number was in PostgreSQL (usually 5432).
+                </p>
+
+                <p>
+                    Enter a password, and then save.
+                </p>
+            </li>
+        </ol>
+        
+        <p>
+            Within a few seconds, the development and test databases that PostgreSQL serves on your machine will appear in the tree pane. If you want to explore your data, you follow a specific database's tree to Schemas/Tables. Select the table you want to explore, right click and then select View/Edit data. Of course, pgAdmin4 will also allow you to edit, add, and remove instances or entire tables. Now that your database viewer is set up, these databases to test and develop your applications. 
+        </p>
+
+
+        <h4>Connecting pgAdmin4 to a Database on Heroku</h4>
+
+        <p>
+            These step-by-step instructions largely follows the instructions available from <a href='https://medium.com/@vapurrmaid/getting-started-with-heroku-postgres-and-pgadmin-run-on-part-2-90d9499ed8fb' target='_blank'>this useful blog by Grey Barkans on Medium</a>. Grey goes into a little more depth and provides a few helpful screenshots. This guide aims to keep things simple.
+        </p>
+
+        <p>
+            If you skipped directly to these instructions and did not need to connect a development database to pgAdmin, please follow the first two steps of the instructions above. You will still need to install pgAdmin4 and set a password.
+        </p>
+
+        <ol>
+            <li>
+                <p>
+                    Log into your Heroku account and select the API app with the database you want to connect to pgAdmin4, then click on the resources tab. Alternatively, you can just go to the URL in your browser: dashboard.heroku.com/apps/NAME_OF_YOUR_API/resources.
+                </p>
+                
+                <p>
+                    Heroku Postgres should be listed as an add-on. Click 'Heroku Postgres' to open the datastore window.
+                </p>
+            </li>
+
+            <li>
+                <p>
+                    Navigate to the settings tab, then click the 'View Credentials' button. These are the credentials we need to hook pgAdmin4 up to our production database. Keep this page view open; there is a lot of data we are going to need to copy over to pgAdmin.
+                </p>
+            </li>
+
+            <li>
+                <p>
+                    Over on our pgAdmin browser page, you can create a new Server Group if you would like (step 4 in the development instructions). Once the Server Group is active, you should right-click it and select the option to Create a New Server. A dialog box will open.
+                </p>
+
+                <p>
+                    On the General tab, provide your server with a name. Any name will do, but you probably want it to be fairly descriptive -- the name of your app is usually appropriate.
+                </p>
+
+                <p>
+                    Switching over to the Connection tab, provide the host name/address. In this case, it should match the host credentials on Heroku. The address will probably end with .amazonaws.com.
+                </p>
+
+                <p>
+                    The port for pgAdmin should match the port in your Heroku database credentials. Usually, this will be 5432.
+                </p>
+
+                <p>
+                    The maintenance database will match the Heroku database credential.
+                </p>
+
+                <p>
+                    Set the username on pgAdmin to match the user in the Heroku database credentials. The password on pgAdmin should match the password credential on Heroku. You probably want to save the password.
+                </p>
+
+                <p>
+                    On the SSL tab, set the SSL mode to require. 
+                </p>
+
+                <p>
+                    Finally, on the advanced tab, copy the database credential from Heroku into the DB restriction field on pgAdmin. (This field will, thus, match what we set our 'maintenance database' to.)
+                </p>
+
+                <p>
+                    Then save.
+                </p>
+            </li>
+        </ol>
+
+        <p>
+            You should now be able to view your database tables by moving down the tree to Schemas/Tables. You will be able to edit and view instances and tables. Just remember, this is your production database. Any edits you make will be reflected in your deployed application, so this can be inadvisable under most circumstances.
+        </p>
+
+
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=The Invisible Elephant in the Room: Retrofitting pgAdmin to an App&amp;url=http://mattbechtel1.github.io/posts/retrofitting-pgadmin-to-an-app&amp;hashtags=web,dev,blog,soudev"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/retrofitting-pgadmin-to-an-app
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/retrofitting-pgadmin';
+        var disqus_title = "The Invisible Elephant in the Room: Retrofitting pgAdmin to an App";
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
