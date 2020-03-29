@@ -117,7 +117,7 @@ GITHUB SNIPPET HERE
         </p>
 
         <p>
-            My prefered method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
+            My preferred method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
         </p>
 
 <pre class="prettyprint lang=rb">
@@ -134,13 +134,13 @@ SNIPPET GOES HERE
         </p>
 
         <p>
-            As a bonus feature, if you have enabled cacheing in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
+            As a bonus feature, if you have enabled caching in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
         </p>
 
         <h4>Destroy</h4>
 
         <p>
-          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existance of a bed and our beds require the existance of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
+          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existence of a bed and our beds require the existence of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
         </p>
 
         <p>
