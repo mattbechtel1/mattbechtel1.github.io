@@ -120,101 +120,65 @@ GITHUB SNIPPET HERE
             My prefered method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
         </p>
 
-        <pre class="prettyprint lang=rb">
-  <code>
- SNIPPET GOES HERE
-  </code></pre>
-        <p>
-          With the 'prepend' keyword, our module shares its methods as instance classes and overwrites any instance
-          classes already located in our class. This is quite different from a class inheritance structure, where a
-          method of a parent class would not overwrite the method in a child class. Our module is able to do this by
-          forcing itself to position one in the ancestors list, even before the name of the class it was called upon!
-        </p>
-
-        <p>
-          And finally, we can <strong>include</strong> a module in a class.
-        </p>
-
-        <pre class="prettyprint lang=rb">
+<pre class="prettyprint lang=rb">
 <code>
-module MyModule
-    def clarity
-        "This code is in the clarity method of MyModule"
-    end
- 
-    def num
-        @num
-    end
-
-    def add_one
-        self.num + 1
-    end   
-end
-
-class MyClass
-    include MyModule
-
-    def initialize(num)
-        @num = num
-    end
-
-
-    def clarity
-        "this code is in the clarity instance method of MyClass"
-    end
-end
-
-instance1 = MyClass.new(1)
-
-MyClass.clarity # => undefined method `clarity' for MyClass:Class
-instance1.clarity # => 'this code is in the clarity instance method of MyClass'
-instance1.add_one # => 2
-MyClass.ancestors.first # => MyClass
+SNIPPET GOES HERE
 </code></pre>
 
         <p>
-          Again, calling our modules method as a class method results in a no method error, and, unlike with 'prepend',
-          by using the 'include' keyword, our class's instance methods have priority over those in the module. However,
-          we are able to call other module-based methods on our instances and can even use instance variables specific
-          to our class within those methods. We can even house our getter and setter methods within the module.
+            The 'touches' in the models will cascade upward to the ultimate 'one' in our one-to-many relationships. When we create or update a stage, it will automatically update the updated_at column for its bed, which, having been updated, will touch and update the updated_at column for its field.
         </p>
 
         <p>
-          Because Ruby goes up the family tree to find relevant instance methods when they are called, this is key to
-          determining when to include a module verses when to prepend a module with a class. Extend is used for class
-          methods only.
+          Touch in models only works in one direction: from child to parent (many to one). That is sensible for an app like Succotash. Touch in a controller, on the other hand, does not even need a relationship to exist. Your controller can 'touch' any instance and update its updated_at field, even when there is no direct relationship.
         </p>
-
-        <h4>When Should We Incorporate Modules?</h4>
 
         <p>
-          Moving beyond the obvious answer that we use modules such as Enumerables and Math on a day-to-day basis and
-          that various standard support products such as ActiveRecord are themselves modules, modules should probably be
-          used fairly sparingly in simple applications. While modules have the ability to DRY out code, mixing too many
-          modules into classes for a small set of methods can add too much abstraction.
+            As a bonus feature, if you have enabled cacheing in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
         </p>
 
-        <img src="https://media.giphy.com/media/gOPWeWB9fuxm8/giphy.gif" alt="Mix mix mix" style="display: block; margin-left: auto; margin-right: auto;">
-        <p class="iframelabel"><a href="https://giphy.com/gifs/weekend-dc-bets-gOPWeWB9fuxm8">via GIPHY</a></p>
+        <h4>Destroy</h4>
 
         <p>
-          Is there a hint that we should be using a module rather than placing methods in classes? If code appears to be
-          repetitive across our classes, then placing methods in a module could probably take their place. Another
-          situation is if we have a set of methods that are not obviously related to a single class but have some kind
-          of commonality (such as all our math functions), they probably belong in a module.
+          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existance of a bed and our beds require the existance of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
         </p>
 
+        <p>
+          There are a few different ways to set up cascading deletions in Rails. However, I am very much of the opinion that using database-related functionality with Rails is preferable to using only Rails. <a href='../postgresql-enums/'>See my blog on PostgreSQL enums for another example.</a>
+        </p>
+
+        <p>
+            I like to set up cascade deletions in migration files for that reason. Adding {on_delete: cascade} to our foreign keys will tell Rails to write SQL that effectively tells the table to cascade our deletions. If you are adding this feature to an already built table, the code will look something like:
+        </p>
+
+<pre class="prettyprint lang=rb">
+<code>
+SNIPPET GOES HERE
+</code></pre>
+
+        <p>
+            Or, if you have planned ahead and are setting up cascade deletion in your initial table migration with Rail's t.reference syntax, you could set up cascade deletions in the following syntax:
+        </p>
+
+<pre class="prettyprint lang=rb">
+<code>
+SNIPPET GOES HERE
+</code></pre>
+
+        <p>
+            These small pieces of code will help you avoid nasty errors in your Rails and database set-up. Cascade destruction of instances is extremely important in keeping complex apps from breaking, as well as from having dated useless rows in your databases.
+        </p>
 
 
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=Ruby Modules: The When, Where, and How&amp;url=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-how&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+        <a href="http://twitter.com/share?text=RESTful Cascading in Rails&amp;url=http://mattbechtel1.github.io/restful-cascading&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/ruby-modules-the-when-where-and-ho"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/restful-cascading"
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -227,8 +191,8 @@ MyClass.ancestors.first # => MyClass
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/ruby-modules-the-when-where-and-how';
-        var disqus_title = 'Ruby Modules: The When, Where, and How';
+        var disqus_identifier = '/restful-cascading';
+        var disqus_title = 'RESTful Cascading in Rails';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
@@ -255,7 +219,7 @@ MyClass.ancestors.first # => MyClass
         <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
         <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
       </ul>
-      <small>&copy; 2019 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
           class="icon icon-heart"></i></small>
       <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
     </footer>
