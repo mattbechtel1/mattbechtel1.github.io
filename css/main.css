@@ -527,7 +527,7 @@ pre code {
 }
 
 .highlight, .highlight .hll, .highlight pre, .highlight code {
-    background-color: #272822 !important;
+    /* background-color: #272822 !important; */
     border: none
 }
 
