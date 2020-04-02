@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> RESTful Cascading in Rails | Hello, World extended </title>
+  <meta name="description" content="RESTful Cascading in Rails">
+  <meta name="keywords" content="rails, cascading, touch, updated_at">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">RESTful Cascading in Rails</h1>
+          <p class="post-meta">March 28, 2020</p>
+        </header>
+        <h4>Why Cascade?</h4>
+        <p>
+          One of the primary benefits of using REST architecture in designing our APIs is that it helps us keep our server-side code simple. It is not difficult to imagine a very simple application where creating, editing, and deleting an instance of a class does not alter any other instances. Put another way, we are imagining an app with no relationships between models. However, the fact is, very few practical object-oriented apps above the most simplistic lack join tables and relationships.
+        </p>
+
+        <p>
+          In Rails, we can set instances' relationships to other classes' instances in our models. Those keywords that Rails developers have used so often -- 'belongs_to', 'has_many', and 'has_one' -- appear at the top of most model classes.
+        </p>
+
+        <p>
+            In this blog, I am going to be focusing on the one-to-many relationship. These relationships need to be carefully coded for all potentially transformative HTTP verbs: POST, PATCH/PUT, DELETE. Instances on the many side of the one-to-many are dependent upon the one side. So, if something happens to the one, we may want to also touch on the many. Likewise, if something happens to one of our many-side instances, we may want to make an update to our one. While we could effectively code any edit into the controller actions, Rails provides a few tools to help us out with cascading updates and deletions.
+        </p>
+
+        <h4>Create</h4>
+
+        <p>
+            Let's say we are building an app like <a href='http://succotash-app.herokuapp.com' target='_blank'>Succotash</a>. When a user creates a new field, we want to build out the associated subunits for that field, and then also a few initial stages (time periods) for the app. In this case, the field has many subunits (beds), which in turn have many stages. We need to cascade these creations and associate them all together, while only really receiving data for our top-level from the front-end.
+        </p>
+
+        <p>
+            The code below shows how we can create so many instances from just one request. Notice, however, that the beds and stages all are provided with what are essentially default values. (This code is a simplified version of what is used in the app.)
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/5cafe29e0ea885bd821c14542b71a049.js"></script>
+
+        <p>
+          Rather than having to write a few chained methods on our front-end that cycle through three or more request/response cycles, we have only hit our backend once and managed to create all the relationships in one controller method.
+        </p>
+
+        <p>
+            While we could also use a similar pattern to cascade our updates and deletions, Rails provides us with some tools to simplify the process.
+        </p>
+
+
+        <h4>Update</h4>
+
+        <p>
+            The controller is also the place you want to make any updates to different instances using the same pattern demonstrated above. But what if you just want to cascade your updated_at times? Rails and ActiveRecord provides a neat little keyword that can cascade our updated_at (or other) dates. 
+        </p>
+
+        <p>
+            Thinking again about Succotash, it is indeed possible that a user could update Stages and Beds without ever actually touching our Field instance. But to our user, they think they are updating the field when they update its children. Considering our profile page sorts fields by their updated_at time, we definitely want to update the field.
+        </p>
+
+        <p>
+            There are two ways to do this: in the controller and in the model. Both use the same keyword: <a href='https://apidock.com/rails/ActiveRecord/Persistence/touch' target='_blank'>touch</a>. To do so in the controller:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/eff7daab3898342c96c74f52e348a5a4.js"></script>
+
+        <p>
+            By calling the touch method on an instance, it updates the field provided to the present time. It does not need to be our updated_at field either. We could 'touch' any field where the schema allows a datetime and update it to the present time by passing that field's name as an argument to touch.
+        </p>
+
+        <p>
+            My preferred method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/f260dce4259fdc3744ff836022afe244.js"></script>
+
+        <p>
+            The 'touches' in the models will cascade upward to the ultimate 'one' in our one-to-many relationships. When we create or update a stage, it will automatically update the updated_at column for its bed, which, having been updated, will touch and update the updated_at column for its field.
+        </p>
+
+        <p>
+          Touch in models only works in one direction: from child to parent (many to one). That is sensible for an app like Succotash. Touch in a controller, on the other hand, does not even need a relationship to exist. Your controller can 'touch' any instance and update its updated_at field, even when there is no direct relationship.
+        </p>
+
+        <p>
+            As a bonus feature, if you have enabled caching in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
+        </p>
+
+        <h4>Destroy</h4>
+
+        <p>
+          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existence of a bed and our beds require the existence of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
+        </p>
+
+        <p>
+          There are a few different ways to set up cascading deletions in Rails. However, I am very much of the opinion that using database-related functionality with Rails is preferable to using only Rails. <a href='../postgresql-enums/'>See my blog on PostgreSQL enums for another example.</a>
+        </p>
+
+        <p>
+            I like to set up cascade deletions in migration files for that reason. Adding {on_delete: cascade} to our foreign keys will tell Rails to write SQL that effectively tells the table to cascade our deletions. If you are adding this feature to an already built table, the code will look something like:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/bc1317f8d90fc202dc56b1a9e0c1497a.js"></script>
+
+        <p>
+            Or, if you have planned ahead and are setting up cascade deletion in your initial table migration with Rail's t.reference syntax, you could set up cascade deletions in the following syntax:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/2457ab95797c9f500e458f9532c0aeb8.js"></script>
+
+        <p>
+            These small pieces of code will help you avoid nasty errors in your Rails and database set-up. Cascade destruction of instances is extremely important in keeping complex apps from breaking, as well as from having dated useless rows in your databases.
+        </p>
+
+
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=RESTful Cascading in Rails&amp;url=http://mattbechtel1.github.io/restful-cascading&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/restful-cascading"
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/restful-cascading';
+        var disqus_title = 'RESTful Cascading in Rails';
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
