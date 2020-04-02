@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Save Cash with Cache: Minimizing API Calls with Redis | Hello, World extended </title>
+  <meta name="description" content="Minimizing API Calls with Redis">
+  <meta name="keywords" content="rails, caching, redis, API">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/feed.xml" target="_blank"><i class="icon icon-feed"></i> feed</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">Save Cash with Cache: Minimizing API Calls with Redis</h1>
+          <p class="post-meta">April 2, 2020</p>
+        </header>
+        <h4>API Call Expenses</h4>
+        <p>
+            With the amount of public and pseudo-public APIs out in the world today, there is no shortage of databases for you and other developers to use to develop your own application. And the API providers know this too. Very few of the most popular APIs allow everyone and anyone to hit their databases at will.
+        </p>
+
+        <p>
+            Most of the time, a developer will need to be issued a unique API key to send along as a header in their requests. The public API developer then has quite a few options to limit your access. They may set a daily or monthly limit on your API. If they are really creative, they could throttle your requests to spread out services. And, of course, they could take your credit card information and charge you a rate for each request.  No matter which limitation option the API developer chooses, you have an interest in limiting your requests to their API.
+        </p>
+        
+        <p>
+            There are also the other expenses of an API call: time and allocations. If we can avoid making superfluous calls to the external API, our app will inevitably run faster as we will cut out the request-response cycle. We will tax our server less, and deliver data to our frontend views faster.
+        </p>
+
+        <p>
+            Caching is the obvious solution here. If we can store previous data responses from the external API on our own server, we can access them when people call on our views or API. In this blog, I will provide an example of this simple coding pattern using a Rails controller file running alongside a Redis server.
+        </p>
+
+        <h4>Setting Up Redis Locally</h4>
+
+        <p>
+            Before you can get started with caching, you will need to set up Redis on your machine. If you have not already, download the latest stable version of Redis from the project's <a href='https://redis.io/download' target='_blank'>downloads page</a>.
+        </p>
+
+        <p>
+            You should now have access to the command line commands `redis-server` and `redis-cli`, which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
+        </p>
+
+        <p>
+            I assume here that we have already run `rails new` and created a simple object-oriented application. With Redis installed, we now have to integrate it into our development environment in Rails. We need to tell Rails that we will a) be using a cache store and b) Redis will be our cache store. In order to tell Rails that a cache store, we need to create a temporary file, for which we have a few simple command line options:
+        </p>
+
+<pre class="prettyprint lang-bsh">
+<code>touch tmp/caching-dev.txt</code>
+</pre>
+
+        <p>
+            or:
+        </p>
+
+<pre class="prettyprint lang-bsh">
+<code>rails dev:cache</code>
+</pre>
+
+        <p>
+            Running the command `rails dev:cache` a second time will toggle caching off and remove the temp file.
+        </p>
+
+        <p>
+            Now that Rails knows we intend to cache data, we need to set it up to use Redis. In our development environment file, we need to change a variable. In the caching section, our environment file should include:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/57e506ecbf6ab9237c6eb8133888810e.js"></script>
+
+        <p>
+            Most of this snippet is already provided, but we want to change our cache_store option to `:redis_cache_store`. I also changed the max-age of our cache to 365 days, but you can choose what every you would like. If you provide that field with an integer, it will assume you are providing the number of seconds.
+        </p>
+
+        <p>
+            We also need to add a few gems to our gemfile to get Redis working. Our gemfile should now include:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/02e869bfd0401d68753a4609c545201a.js"></script>
+
+        <p>
+            Lastly, we need to initialize an instance of Redis for our application. There are a number of syntax options, including using a global variable or not initializing at all and just calling `Rails.cache.redis` every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
+            <br />
+            <em>I use the <a href='https://github.com/laserlemon/figaro'>Figaro</a> gem to store environment variables in my projects and in the code below, but there are other, more common, Rails-centric ways to store environment variables.</em>
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
+
+        <p>
+            The password option should only be included if you set a password to access your Redis server (requirepass myRedisPassword). You can also pass it through at the end of your initailzer file with Redis.current.auth(Figaro.env.redis_password)
+        </p>
+
+        <p>
+            And lastly, we will need to run `redis-server` from our command line to boot up our server.
+        </p>
+
+        <p>
+            With our cache store set up for use in Rails and Redis running, we are ready to manipulate our controller files to minimize our API calls.
+        </p>
+
+        <h4>Changing our API Calls</h4>
+
+        <p>
+            I first implemented this caching pattern in an API on a transit app I created using <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of CoVid-19, it is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
+        </p>
+
+        <!-- BLOG COMPLETE THROUGH HERE -->
+
+        <p>
+            Thinking again about Succotash, it is indeed possible that a user could update Stages and Beds without ever actually touching our Field instance. But to our user, they think they are updating the field when they update its children. Considering our profile page sorts fields by their updated_at time, we definitely want to update the field.
+        </p>
+
+        <p>
+            There are two ways to do this: in the controller and in the model. Both use the same keyword: <a href='https://apidock.com/rails/ActiveRecord/Persistence/touch' target='_blank'>touch</a>. To do so in the controller:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/eff7daab3898342c96c74f52e348a5a4.js"></script>
+
+        <p>
+            By calling the touch method on an instance, it updates the field provided to the present time. It does not need to be our updated_at field either. We could 'touch' any field where the schema allows a datetime and update it to the present time by passing that field's name as an argument to touch.
+        </p>
+
+        <p>
+            My preferred method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/f260dce4259fdc3744ff836022afe244.js"></script>
+
+        <p>
+            The 'touches' in the models will cascade upward to the ultimate 'one' in our one-to-many relationships. When we create or update a stage, it will automatically update the updated_at column for its bed, which, having been updated, will touch and update the updated_at column for its field.
+        </p>
+
+        <p>
+          Touch in models only works in one direction: from child to parent (many to one). That is sensible for an app like Succotash. Touch in a controller, on the other hand, does not even need a relationship to exist. Your controller can 'touch' any instance and update its updated_at field, even when there is no direct relationship.
+        </p>
+
+        <p>
+            As a bonus feature, if you have enabled caching in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
+        </p>
+
+        <h4>Destroy</h4>
+
+        <p>
+          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existence of a bed and our beds require the existence of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
+        </p>
+
+        <p>
+          There are a few different ways to set up cascading deletions in Rails. However, I am very much of the opinion that using database-related functionality with Rails is preferable to using only Rails. <a href='../postgresql-enums/'>See my blog on PostgreSQL enums for another example.</a>
+        </p>
+
+        <p>
+            I like to set up cascade deletions in migration files for that reason. Adding {on_delete: cascade} to our foreign keys will tell Rails to write SQL that effectively tells the table to cascade our deletions. If you are adding this feature to an already built table, the code will look something like:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/bc1317f8d90fc202dc56b1a9e0c1497a.js"></script>
+
+        <p>
+            Or, if you have planned ahead and are setting up cascade deletion in your initial table migration with Rail's t.reference syntax, you could set up cascade deletions in the following syntax:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/2457ab95797c9f500e458f9532c0aeb8.js"></script>
+
+        <p>
+            These small pieces of code will help you avoid nasty errors in your Rails and database set-up. Cascade destruction of instances is extremely important in keeping complex apps from breaking, as well as from having dated useless rows in your databases.
+        </p>
+
+
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=RESTful Cascading in Rails&amp;url=http://mattbechtel1.github.io/restful-cascading&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/restful-cascading"
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/restful-cascading';
+        var disqus_title = 'RESTful Cascading in Rails';
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
