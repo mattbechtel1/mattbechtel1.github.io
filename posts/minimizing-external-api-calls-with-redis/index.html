@@ -60,7 +60,7 @@
         </p>
 
         <p>
-            Most of the time, a developer will need to be issued a unique API key to send along as a header in their requests. The public API developer then has quite a few options to limit your access. They may set a daily or monthly limit on your API. If they are really creative, they could throttle your requests to spread out services. And, of course, they could take your credit card information and charge you a rate for each request.  No matter which limitation option the API developer chooses, you have an interest in limiting your requests to their API.
+            Most of the time, a developer will be issued a unique API key to send along as a header in their requests. The public API developer then has quite a few options to limit your access. They may set a daily or monthly limit on your API. If they are really creative, they could throttle your requests to spread out services. And, of course, they could take your credit card information and charge you a rate for each request.  No matter which limitation option the API developer chooses, you have an interest in limiting your requests to their API.
         </p>
         
         <p>
@@ -108,7 +108,7 @@
         <script src="https://gist.github.com/mattbechtel1/57e506ecbf6ab9237c6eb8133888810e.js"></script>
 
         <p>
-            Most of this snippet is already provided, but we want to change our cache_store option to `:redis_cache_store`. I also changed the max-age of our cache to 365 days, but you can choose what every you would like. If you provide that field with an integer, it will assume you are providing the number of seconds.
+            Most of this snippet is already provided, but we want to change our cache_store option to `:redis_cache_store`. I also changed the maximum age of the cache to 365 days, but you can choose what every you would like when setting up your store. If you provide that field with an integer, it will assume you are providing the number of seconds.
         </p>
 
         <p>
@@ -119,14 +119,16 @@
 
         <p>
             Lastly, we need to initialize an instance of Redis for our application. There are a number of syntax options, including using a global variable or not initializing at all and just calling `Rails.cache.redis` every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
-            <br />
-            <em>I use the <a href='https://github.com/laserlemon/figaro'>Figaro</a> gem to store environment variables in my projects and in the code below, but there are other, more common, Rails-centric ways to store environment variables.</em>
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
+          </p>
+          
+          <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
+          
+          <p>
+            <em>I use the <a href='https://github.com/laserlemon/figaro'>Figaro</a> gem to store environment variables in my projects and therefore use a application.yml file, but there are other, more common, Rails-centric ways to store environment variables.</em>
+          </p>
 
         <p>
-            The password option should only be included if you set a password to access your Redis server (requirepass myRedisPassword). You can also pass it through at the end of your initailzer file with Redis.current.auth(Figaro.env.redis_password)
+            The password option should only be included if you set a password to access your Redis server (requirepass myRedisPassword). You can also pass it through at the end of your initailizer file with Redis.current.auth(ENV["REDIS_PASSWORD"])
         </p>
 
         <p>
@@ -137,82 +139,78 @@
             With our cache store set up for use in Rails and Redis running, we are ready to manipulate our controller files to minimize our API calls.
         </p>
 
-        <h4>Changing our API Calls</h4>
+        <h4>Dr. Redis</h4>
+        <h5>or: How I Learned to Stop Worrying and Love the JSON</h5>
 
         <p>
-            I first implemented this caching pattern in an API on a transit app I created using <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of CoVid-19, it is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
-        </p>
-
-        <!-- BLOG COMPLETE THROUGH HERE -->
-
-        <p>
-            Thinking again about Succotash, it is indeed possible that a user could update Stages and Beds without ever actually touching our Field instance. But to our user, they think they are updating the field when they update its children. Considering our profile page sorts fields by their updated_at time, we definitely want to update the field.
+            I first implemented this caching pattern in an API on a transit app I created using <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of Covid-19, it is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
         </p>
 
         <p>
-            There are two ways to do this: in the controller and in the model. Both use the same keyword: <a href='https://apidock.com/rails/ActiveRecord/Persistence/touch' target='_blank'>touch</a>. To do so in the controller:
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/eff7daab3898342c96c74f52e348a5a4.js"></script>
-
-        <p>
-            By calling the touch method on an instance, it updates the field provided to the present time. It does not need to be our updated_at field either. We could 'touch' any field where the schema allows a datetime and update it to the present time by passing that field's name as an argument to touch.
+            Our strategy is to cache responses on the first call and set the length of time the data will survive in our cache. My full transit app has <a href='https://github.com/mattbechtel1/Metrobus2020/blob/master/backend/config/routes.rb' target='_blank'>seven different routes</a> that each connect (through a controller) to a unique endpoint of WMATA's API. And each of those endpoints has different considerations for how long we need to cache their response. For the endpoint that provide bus prediction data, we probably only want to cache the data for less than a minute, since that data will quickly become stale. For the endpoint that delivers us a list of different rail line names, we could keep that data fresh until the Purple line opens in late 2022.
         </p>
 
         <p>
-            My preferred method of updating the updated_at field, however, is to provide the touch method to my models. This fix eliminates the need to add the extra code to the controller.
+          I will use the API fetch to the list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this data at least once per week. In our controller:
         </p>
 
-        <script src="https://gist.github.com/mattbechtel1/f260dce4259fdc3744ff836022afe244.js"></script>
+        <script src="https://gist.github.com/mattbechtel1/6cba0ca9da6e5df9a900faacb4c5f0fa.js"></script>
 
         <p>
-            The 'touches' in the models will cascade upward to the ultimate 'one' in our one-to-many relationships. When we create or update a stage, it will automatically update the updated_at column for its bed, which, having been updated, will touch and update the updated_at column for its field.
-        </p>
-
-        <p>
-          Touch in models only works in one direction: from child to parent (many to one). That is sensible for an app like Succotash. Touch in a controller, on the other hand, does not even need a relationship to exist. Your controller can 'touch' any instance and update its updated_at field, even when there is no direct relationship.
+          So, first we check to see if Redis has already stored data associated with our key ('allBuses'). If not, we complete the API call as normal, which returns a JSON object. We then set the JSON object as the value for our 'allBuses' key and set an expiration time of one week (604,800 seconds).
         </p>
 
         <p>
-            As a bonus feature, if you have enabled caching in Rails, touch will also automatically expire the cache of dependent objects. This feature is particularly helpful if you have an ERB app that uses a <a href='https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching' target='_blank'>Russian Doll ERB setup</a>.
-        </p>
-
-        <h4>Destroy</h4>
-
-        <p>
-          The final and, probably most important transformative method to code correctly is our destroy/delete method. In the models we have been using as examples in this blog post, our stages requires the existence of a bed and our beds require the existence of a field. Without setting our models or database up correctly, we would need to code all these deletions into our controller. That is not impossible, by any means, but it could be time consuming -- either by designing nested loops or writing very complex code or a combination thereof. 
+          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with just <a href='https://redis.io/commands/hset' target='_blank'>a slightly different command</a>. It may be tempting to store a hash or list in Redis, then. But let's take a moment to consider what that would require our controller to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a secondary-key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route. That's awfully complicated. Key-value databases like Redis are not practical for storing deeply nested hashes and arrays. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
         </p>
 
         <p>
-          There are a few different ways to set up cascading deletions in Rails. However, I am very much of the opinion that using database-related functionality with Rails is preferable to using only Rails. <a href='../postgresql-enums/'>See my blog on PostgreSQL enums for another example.</a>
+          But... what does Ruby think that JSON response is exactly? A string! We don't need to convert our JSON into anything Ruby can iterate over. That's our single-page frontend's (or Rails view's) problem. In Redis and Rails, we can just store the gigantic, ugly JSON string as the value for the 'allBuses' key.
         </p>
 
         <p>
-            I like to set up cascade deletions in migration files for that reason. Adding {on_delete: cascade} to our foreign keys will tell Rails to write SQL that effectively tells the table to cascade our deletions. If you are adding this feature to an already built table, the code will look something like:
+          What kind of time does this save? Let's call the bus_route_list method twice and find out.
         </p>
 
-        <script src="https://gist.github.com/mattbechtel1/bc1317f8d90fc202dc56b1a9e0c1497a.js"></script>
+<pre class="prettyprint lang-bsh">
+<code>
+# call method with Redis key not yet existing
+  Processing by MetroController#bus_route_list as */*
+  Completed 200 OK in 150ms (Views: 0.2ms | ActiveRecord: 0.0ms | Allocations: 1288)
+
+# call method again finding the Redis key and returning the cached data
+  Processing by MetroController#bus_route_list as */*
+  Completed 200 OK in 2ms (Views: 0.1ms | ActiveRecord: 0.0ms | Allocations: 145)
+</code>
+</pre>
 
         <p>
-            Or, if you have planned ahead and are setting up cascade deletion in your initial table migration with Rail's t.reference syntax, you could set up cascade deletions in the following syntax:
+          We went from 150ms to get a 200 response down to just 2ms, and from 1288 memory allocations to just 145! We have saved fairly significant time and space with our cache in addition to saving towards our monthly API call limit.
         </p>
-
-        <script src="https://gist.github.com/mattbechtel1/2457ab95797c9f500e458f9532c0aeb8.js"></script>
 
         <p>
-            These small pieces of code will help you avoid nasty errors in your Rails and database set-up. Cascade destruction of instances is extremely important in keeping complex apps from breaking, as well as from having dated useless rows in your databases.
+          The bus_route_list method is similar to an index method in a more RESTful Rails APi controller. When sending along a parameter, we can just store that parameter as part of the key. In the same controller class, we can call the WMATA API endpoint that provides us a list of upcoming bus arrivals when provided with a bus stop's id:
         </p>
 
+        <script src="https://gist.github.com/mattbechtel1/695524388b37935e979bc5b75f7a2ec9.js"></script>
+
+        <p>
+           By using the parameter for the bus stop ID as part of the key, we can store potentially as many as keys as WMATA has unique bus stops.
+        </p>
+
+        <p>
+          Because of how frequently the WMATA API updates bus arrivals, we set the key-value pair to expire after only 20 seconds. While the expiration time was used in both examples above, it is not required that we use this option. If we do not set an expiration time limit, the key will not expire until either a) Redis runs out of space and your <a href='https://redis.io/topics/lru-cache'>eviction policy</a> removes the key or b) you manually delete it.
+        </p>
 
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=RESTful Cascading in Rails&amp;url=http://mattbechtel1.github.io/restful-cascading&amp;hashtags=web,dev,blog,soudev&amp;via=nandomoreirame"
+        <a href="http://twitter.com/share?text=Minimizing API Calls with Redis&amp;url=http://mattbechtel1.github.io/minimizing-external-api-calls-with-redis&amp;hashtags=web,dev,blog,soudev"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/restful-cascading"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/minimizing-external-api-calls-with-redis"
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -225,8 +223,8 @@
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/restful-cascading';
-        var disqus_title = 'RESTful Cascading in Rails';
+        var disqus_identifier = '/minimizing-external-api-calls-with-redis';
+        var disqus_title = 'Minimizing API Calls with Redis';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
