@@ -74,11 +74,11 @@
         <h4>Setting Up Redis Locally</h4>
 
         <p>
-            Before you can get started with caching, you will need to set up Redis on your machine. If you have not already, download the latest stable version of Redis from the project's <a href='https://redis.io/download' target='_blank'>downloads page</a>.
+            Before you can get started with caching, you will need to set up Redis on your machine. If you have not already, download and install the latest stable version of Redis from the project's <a href='https://redis.io/download' target='_blank'>downloads page</a>.
         </p>
 
         <p>
-            You should now have access to the command line commands `redis-server` and `redis-cli`, which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
+            You should then gain access to the cli commands `redis-server` and `redis-cli`, which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
         </p>
 
         <p>
@@ -151,21 +151,21 @@
         </p>
 
         <p>
-          I will use the API fetch to the list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this data at least once per week. In our controller:
+          I will use the API call to the full list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this data at least once per week. In our controller:
         </p>
 
         <script src="https://gist.github.com/mattbechtel1/6cba0ca9da6e5df9a900faacb4c5f0fa.js"></script>
 
         <p>
-          So, first we check to see if Redis has already stored data associated with our key ('allBuses'). If not, we complete the API call as normal, which returns a JSON object. We then set the JSON object as the value for our 'allBuses' key and set an expiration time of one week (604,800 seconds).
+          So, first we check to see if our Redis instance has already stored data associated with our key ('allBuses'). If not, we complete the API call as normal, which returns a JSON object. We then set the JSON object as the value for our 'allBuses' key and set an expiration time of one week (604,800 seconds).
         </p>
 
         <p>
-          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with just <a href='https://redis.io/commands/hset' target='_blank'>a slightly different command</a>. It may be tempting to store a hash or list in Redis, then. But let's take a moment to consider what that would require our controller to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a secondary-key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route. That's awfully complicated. Key-value databases like Redis are not practical for storing deeply nested hashes and arrays. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
+          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with only <a href='https://redis.io/commands/hset' target='_blank'>slightly different commands</a>. It may be tempting to convert our JSON response to a hash or list to store in Redis, then. But let's take a moment to consider what that would require our method to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a namespaced key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route, where the key becomes a second namespace and our first key suddenly looks something like 'allBuses:0:RouteID' with a value of '10A'. That's awfully complicated. Key-value databases like Redis are not designed to store nested hashes. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
         </p>
 
         <p>
-          But... what does Ruby think that JSON response is exactly? A string! We don't need to convert our JSON into anything Ruby can iterate over. That's our single-page frontend's (or Rails view's) problem. In Redis and Rails, we can just store the gigantic, ugly JSON string as the value for the 'allBuses' key.
+          But... what exactly does Ruby think that JSON response's datatype is? A string! We don't need to convert our JSON into something Ruby can iterate over. Unpacking that data is our frontend's problem. Our Redis instance can store the ugly JSON string as the value for the 'allBuses' key.
         </p>
 
         <p>
@@ -185,21 +185,21 @@
 </pre>
 
         <p>
-          We went from 150ms to get a 200 response down to just 2ms, and from 1288 memory allocations to just 145! We have saved fairly significant time and space with our cache in addition to saving towards our monthly API call limit.
+          We went from 150ms to get a 200 response down to just 2ms, and from 1288 memory allocations to 145! We have saved fairly significant time and space with our cache in addition to saving 1 request on our monthly and per second API call limits.
         </p>
 
         <p>
-          The bus_route_list method is similar to an index method in a more RESTful Rails APi controller. When sending along a parameter, we can just store that parameter as part of the key. In the same controller class, we can call the WMATA API endpoint that provides us a list of upcoming bus arrivals when provided with a bus stop's id:
+          The bus_route_list method is similar to an index method in a more RESTful Rails API controller. It delivers an array and does not need to read any parameters to deliver that array. For methods that require us to send along a parameter, we can store that parameter as part of the key. In the same controller class, we can call the WMATA API endpoint that provides us a list of upcoming bus arrivals when provided with a bus stop's id:
         </p>
 
         <script src="https://gist.github.com/mattbechtel1/695524388b37935e979bc5b75f7a2ec9.js"></script>
 
         <p>
-           By using the parameter for the bus stop ID as part of the key, we can store potentially as many as keys as WMATA has unique bus stops.
+           By using the parameter for the bus stop ID as part of the key, we can potentially store as many as keys as WMATA has unique bus stops.
         </p>
 
         <p>
-          Because of how frequently the WMATA API updates bus arrivals, we set the key-value pair to expire after only 20 seconds. While the expiration time was used in both examples above, it is not required that we use this option. If we do not set an expiration time limit, the key will not expire until either a) Redis runs out of space and your <a href='https://redis.io/topics/lru-cache'>eviction policy</a> removes the key or b) you manually delete it.
+          Because of how frequently the WMATA API updates bus arrivals, we set the key-value pair to expire after only 20 seconds. While the expiration time was used in both of the examples above, it is not required that we use this option. If we do not set an expiration time limit, the key will not expire until either a) Redis runs out of space and your <a href='https://redis.io/topics/lru-cache'>eviction policy</a> removes the key or b) you manually delete it.
         </p>
 
     </section>
