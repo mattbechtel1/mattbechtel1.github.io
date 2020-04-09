@@ -804,3 +804,7 @@ pre code {
     margin: 4px 10px 0px 0px;
     border: 1px;
 }
+
+.command {
+    background-color: peachpuff;
+}

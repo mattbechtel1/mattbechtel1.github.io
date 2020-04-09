@@ -78,11 +78,11 @@
         </p>
 
         <p>
-            You should then gain access to the cli commands `redis-server` and `redis-cli`, which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
+            You should then gain access to the cli commands <span class='command'>redis-server</span> and "redis-cli", which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
         </p>
 
         <p>
-            I assume here that we have already run `rails new` and created a simple object-oriented application. With Redis installed, we now have to integrate it into our development environment in Rails. We need to tell Rails that we will a) be using a cache store and b) Redis will be our cache store. In order to tell Rails that a cache store, we need to create a temporary file, for which we have a few simple command line options:
+            I assume here that we have already run "rails new" and created a simple object-oriented application. With Redis installed, we now have to integrate it into our development environment in Rails. We need to tell Rails that we will a) be using a cache store and b) Redis will be our cache store. In order to tell Rails that a cache store, we need to create a temporary file, for which we have a few simple command line options:
         </p>
 
 <pre class="prettyprint lang-bsh">
@@ -98,7 +98,7 @@
 </pre>
 
         <p>
-            Running the command `rails dev:cache` a second time will toggle caching off and remove the temp file.
+            Running the command "rails dev:cache" a second time will toggle caching off and remove the temp file.
         </p>
 
         <p>
@@ -108,7 +108,7 @@
         <script src="https://gist.github.com/mattbechtel1/57e506ecbf6ab9237c6eb8133888810e.js"></script>
 
         <p>
-            Most of this snippet is already provided, but we want to change our cache_store option to `:redis_cache_store`. I also changed the maximum age of the cache to 365 days, but you can choose what every you would like when setting up your store. If you provide that field with an integer, it will assume you are providing the number of seconds.
+            Most of this snippet is already provided, but we want to change our cache_store option to ":redis_cache_store". I also changed the maximum age of the cache to 365 days, but you can choose what every you would like when setting up your store. If you provide that field with an integer, it will assume you are providing the number of seconds.
         </p>
 
         <p>
@@ -118,7 +118,7 @@
         <script src="https://gist.github.com/mattbechtel1/02e869bfd0401d68753a4609c545201a.js"></script>
 
         <p>
-            Lastly, we need to initialize an instance of Redis for our application. There are a number of syntax options, including using a global variable or not initializing at all and just calling `Rails.cache.redis` every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
+            Lastly, we need to initialize an instance of Redis for our application. There are a number of syntax options, including using a global variable or not initializing at all and just calling "Rails.cache.redis" every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
           </p>
           
           <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
@@ -132,7 +132,7 @@
         </p>
 
         <p>
-            And lastly, we will need to run `redis-server` from our command line to boot up our server.
+            And lastly, we will need to run "redis-server" from our command line to boot up our server.
         </p>
 
         <p>
