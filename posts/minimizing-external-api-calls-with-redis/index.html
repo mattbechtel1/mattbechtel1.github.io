@@ -56,33 +56,33 @@
         </header>
         <h4>API Call Expenses</h4>
         <p>
-            With the amount of public and pseudo-public APIs out in the world today, there is no shortage of databases for you and other developers to use to develop your own application. And the API providers know this too. Very few of the most popular APIs allow everyone and anyone to hit their databases at will.
+            With the amount of public and pseudo-public APIs out in the world today, there is no shortage of databases for developers to use for their own application. And the API providers know this too. Very few of the most popular APIs allow everyone and anyone to hit their databases at will, even when only allowing GET requests.
         </p>
 
         <p>
-            Most of the time, a developer will be issued a unique API key to send along as a header in their requests. The public API developer then has quite a few options to limit your access. They may set a daily or monthly limit on your API. If they are really creative, they could throttle your requests to spread out services. And, of course, they could take your credit card information and charge you a rate for each request.  No matter which limitation option the API developer chooses, you have an interest in limiting your requests to their API.
+            Most of the time, the API provider will issue a developer a unique API key to send along as a header in their requests. The API provider then has quite a few options to limit access. They may set a daily or monthly limit on the developer's API calls. If they are really creative, they could throttle requests to spread out services. And, of course, they could take some credit card information and charge the developer a rate for each request.  No matter which limitation option the API developer chooses, the independent developer has an interest in limiting their requests to the foreign API.
         </p>
         
         <p>
-            There are also the other expenses of an API call: time and allocations. If we can avoid making superfluous calls to the external API, our app will inevitably run faster as we will cut out the request-response cycle. We will tax our server less, and deliver data to our frontend views faster.
+            There are also the other expenses of an API call: time and allocations. If we as developers avoid making superfluous calls to the external API, our app will inevitably run faster as we will cut out the request-response cycle. We will tax our server less and deliver data to our frontend views faster.
         </p>
 
         <p>
-            Caching is the obvious solution here. If we can store previous data responses from the external API on our own server, we can access them when people call on our views or API. In this blog, I will provide an example of this simple coding pattern using a Rails controller file running alongside a Redis server.
+            Caching is the obvious solution here. If we store previous data responses from the external API on our own server, we can access them when people call on our views or API. In this blog, I will provide an example of this simple coding pattern using a Rails controller file running alongside a Redis server.
         </p>
 
-        <h4>Setting Up Redis Locally</h4>
+        <h4>Guide to Setting Up Redis Locally</h4>
 
         <p>
             Before you can get started with caching, you will need to set up Redis on your machine. If you have not already, download and install the latest stable version of Redis from the project's <a href='https://redis.io/download' target='_blank'>downloads page</a>.
         </p>
 
         <p>
-            You should then gain access to the cli commands <span class='command'>redis-server</span> and "redis-cli", which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
+            You should then gain access to the cli commands <span class='command'>redis-server</span> and <span class='command'>redis-cli</span>, which will boot the Redis server and allow you to edit data through the command line respectively. Play around with it a bit to make sure it is working. If you are having difficulty, check out the <a href='https://redis.io/topics/quickstart'>quickstart documentation</a> provided by Redis.
         </p>
 
         <p>
-            I assume here that we have already run "rails new" and created a simple object-oriented application. With Redis installed, we now have to integrate it into our development environment in Rails. We need to tell Rails that we will a) be using a cache store and b) Redis will be our cache store. In order to tell Rails that a cache store, we need to create a temporary file, for which we have a few simple command line options:
+            I assume here that you have already run "rails new" and created a simple object-oriented application. With Redis installed, we now have to integrate it into our development environment in Rails. We need to tell Rails that we will a) be using a cache store and b) Redis will act as that cache store. In order to tell Rails that a cache store will be used in this app, we need to create a temporary file, for which we have a few simple command line options:
         </p>
 
 <pre class="prettyprint lang-bsh">
@@ -98,7 +98,7 @@
 </pre>
 
         <p>
-            Running the command "rails dev:cache" a second time will toggle caching off and remove the temp file.
+            Running the command <span class='command'>rails dev:cache</span> a second time will toggle caching off and remove the temp file.
         </p>
 
         <p>
@@ -108,7 +108,7 @@
         <script src="https://gist.github.com/mattbechtel1/57e506ecbf6ab9237c6eb8133888810e.js"></script>
 
         <p>
-            Most of this snippet is already provided, but we want to change our cache_store option to ":redis_cache_store". I also changed the maximum age of the cache to 365 days, but you can choose what every you would like when setting up your store. If you provide that field with an integer, it will assume you are providing the number of seconds.
+            Most of this snippet is already provided, but we want to change our cache_store option to :redis_cache_store. I also changed the maximum age of the cache to 365 days, but you can choose what ever you would like when setting up your store. If you provide that field with an integer, Rails will assume you are providing the number of seconds.
         </p>
 
         <p>
@@ -117,9 +117,11 @@
 
         <script src="https://gist.github.com/mattbechtel1/02e869bfd0401d68753a4609c545201a.js"></script>
 
+        <p>Then, we run <span class='command'>bundle install</span> to install the gems.</p>
+
         <p>
-            Lastly, we need to initialize an instance of Redis for our application. There are a number of syntax options, including using a global variable or not initializing at all and just calling "Rails.cache.redis" every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
-          </p>
+            Lastly, we need to initialize an instance of Redis for our application. There are a number of options, including using a global variable or not initializing an instance at all and just calling <span class='command'>Rails.cache.redis</span> every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
+        </p>
           
           <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
           
@@ -132,7 +134,7 @@
         </p>
 
         <p>
-            And lastly, we will need to run "redis-server" from our command line to boot up our server.
+            And lastly, we will need to run <span class="command">redis-server</span> from our command line to boot up our server.
         </p>
 
         <p>
@@ -143,15 +145,15 @@
         <h5>or: How I Learned to Stop Worrying and Love the JSON</h5>
 
         <p>
-            I first implemented this caching pattern in an API on a transit app I created using <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of Covid-19, it is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
+            I first implemented this caching pattern in a Rails API on a transit app I created that requests data from <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of Covid-19, the app is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
         </p>
 
         <p>
-            Our strategy is to cache responses on the first call and set the length of time the data will survive in our cache. My full transit app has <a href='https://github.com/mattbechtel1/Metrobus2020/blob/master/backend/config/routes.rb' target='_blank'>seven different routes</a> that each connect (through a controller) to a unique endpoint of WMATA's API. And each of those endpoints has different considerations for how long we need to cache their response. For the endpoint that provide bus prediction data, we probably only want to cache the data for less than a minute, since that data will quickly become stale. For the endpoint that delivers us a list of different rail line names, we could keep that data fresh until the Purple line opens in late 2022.
+            Our strategy is to cache responses on the first call and set the length of time the data will survive in our cache. My full transit app has <a href='https://github.com/mattbechtel1/Metrobus2020/blob/master/backend/config/routes.rb' target='_blank'>seven different routes</a> that connect (through a controller) to a unique endpoint of WMATA's API. And each of those endpoints has different considerations for how long we need to cache their response. For the endpoint that provides bus prediction data, we probably only want to cache the data for less than a minute, since that data will quickly become stale. For the endpoint that delivers us a list of different rail line names, we could keep that data cached until the Purple line opens in late 2022.
         </p>
 
         <p>
-          I will use the API call to the full list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this data at least once per week. In our controller:
+          I will use the API call to the full list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this refresh this data at least once per week. In our controller:
         </p>
 
         <script src="https://gist.github.com/mattbechtel1/6cba0ca9da6e5df9a900faacb4c5f0fa.js"></script>
@@ -161,7 +163,7 @@
         </p>
 
         <p>
-          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with only <a href='https://redis.io/commands/hset' target='_blank'>slightly different commands</a>. It may be tempting to convert our JSON response to a hash or list to store in Redis, then. But let's take a moment to consider what that would require our method to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a namespaced key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route, where the key becomes a second namespace and our first key suddenly looks something like 'allBuses:0:RouteID' with a value of '10A'. That's awfully complicated. Key-value databases like Redis are not designed to store nested hashes. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
+          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with only <a href='https://redis.io/commands/hset' target='_blank'>slightly different commands</a>. It may be tempting to convert our JSON response to a hash or list to store in Redis, then. But let's take a moment to consider what that would require our method to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a namespaced key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route, where the key becomes a second namespace and our first key suddenly looks something like 'allBuses:0' to pass in different keys (RouteId, etc) to come up with a value of '10A'. That's awfully complicated. Key-value databases like Redis are not designed to store nested hashes. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
         </p>
 
         <p>
