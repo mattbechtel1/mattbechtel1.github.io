@@ -806,5 +806,8 @@ pre code {
 }
 
 .command {
-    background-color: rgb(250, 219, 190);
+    color: #fff;
+    background-color: #000000;
+    font-family: "Lucida Console", "Lucida Sans Typewriter", monaco, "Bitstream Vera Sans Mono", monospace;
+    font-style: normal;
 }
