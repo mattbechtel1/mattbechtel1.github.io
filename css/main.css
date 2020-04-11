@@ -810,4 +810,5 @@ pre code {
     background-color: #000000;
     font-family: "Lucida Console", "Lucida Sans Typewriter", monaco, "Bitstream Vera Sans Mono", monospace;
     font-style: normal;
+    font-size: 'initial'
 }
