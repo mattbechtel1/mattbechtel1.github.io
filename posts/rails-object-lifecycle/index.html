@@ -50,7 +50,7 @@
       <article class="post">
         <header class="post-header">
           <h1 class="post-title">RESTful Cascading 2: The Rails Object Lifecycle</h1>
-          <p class="post-meta">April 10, 2020</p>
+          <p class="post-meta">April 11, 2020</p>
         </header>
         <h4>The Problem with Controllers</h4>
         <p>
@@ -58,7 +58,7 @@
         </p>
 
         <p>
-            Despite using three different files to acheive our progress, in most apps, we could have placed the logic for all three updates in the model, all updates in the controller, or even in our database set-up. There may not be an official right answer to the problem, and maybe no wrong answer. But the closest to a bad decision is probably putting all the logic into our controller. 
+            Despite using three different files to achieve our progress, in most apps, we could have placed the logic for all three updates in the model, all updates in the controller, or even in our database set-up. There may not be an official right answer to the problem, and maybe no wrong answer. But the closest to a bad decision is probably putting all the logic into our controller. 
         </p>
         
         <p>
@@ -68,17 +68,17 @@
         <script src="https://gist.github.com/mattbechtel1/5cafe29e0ea885bd821c14542b71a049.js"></script>
 
         <p>
-            That's an awful lot of logic in a controller action. It also gets the job done as far as our user is concerned. But I'm not sure our developers would be pleased. The seed file would need to be gigantic to build a field, patricularly one with lots of bed instances. The same with adding fields with the Rails console command line. We also would not really be able to write any tests for this functionality.
+            That's an awful lot of logic in a controller action. It also gets the job done as far as our user is concerned. But I'm not sure our developers would be pleased. The seed file would need to be gigantic to build a field, particularly one with lots of bed instances. The same with adding fields with the Rails console command line. We also would not really be able to write any tests for this functionality.
         </p>
 
         <p>
             The solution is to move this logic into our models. That way, whether it's a user on the frontend or someone calling <span class='command'>Field.create()</span> in a seed file or the console, we should be able to produce a field with beds, each of which have two default stages.
         </p>
 
-        <h4>The Rails Object Lifecycle</h4>
+        <h4>Rails Object Lifecycle Callbacks</h4>
 
         <p>
-            I covered the basics of the object lifecycle in the previous cascade blog. Objects are created, updated, and destroyed. (They are also saved and touched.) But a lot of the work Rails does is around those steps in the lifecycle. Validations, both those we specifcally declare and ones the database and Rails framework require, are checked when we create or update.
+            I covered the basics of the object lifecycle in the previous cascade blog. Objects are created, updated, and destroyed. (They are also saved and touched.) But a lot of the work Rails does is around those steps in the lifecycle. Validations, both those we specifically declare and ones the database and Rails framework require, are checked when we create or update.
         </p>
 
         <p>
@@ -104,7 +104,7 @@
         </ul>
 
         <p>
-          As we will see below, Rails will be smart and move some of these around when it is appropriate to do so, but this is the basic order of callback functions. The 'save' callbacks will run on both create and update lifecycles, as will the validations. before_create, around_create, and after_create are replaced with their _update counterparts for updates. The validate callbacks are also called when we check if an instance is valid with .valid?
+          As we will see below, Rails will be smart and move some of these around when it is appropriate to do so, but this is the basic order of callback functions. The 'save' callbacks will run on both create and update commands on the lifecycle, as will the validations. before_create, around_create, and after_create are replaced with their _update counterparts for the update command. The validate callbacks are also called when we check if an instance is valid with .valid?
         </p>
 
         <p>
@@ -112,7 +112,7 @@
         </p>
 
         <p>
-          With these callbacks added to our toolbelt, we can start rebuilding our models with parts taken from our bloated controller file.
+          With these callbacks added to our toolbox, we can start rebuilding our models with parts taken from our bloated controller file.
         </p>
 
 
@@ -125,7 +125,7 @@
         <ol>
           <li>
             <p>
-              <u>Create a number of beds based on the parameters</u> - To be clear, most of the time when someone is playing with and testing our development code, they want to add as few parameters as possible, so we want to add a default value here. This will not have the affect of overwritting properly provided parameters (the "strong_params" in our controller). We can either add a default amount in a migration file to code it directly into our database, or, to avoid having to run another migration, we can add the attribute to our model.
+              <u>Create a number of beds based on the parameters</u> - To be clear, most of the time when someone is playing with and testing our development code, they want to add as few parameters as possible, so we want to add a default value here. This will not have the affect of overwriting properly provided parameters (the "strong_params" in our controller). We can either add a default amount in a migration file to code it directly into our database, or, to avoid having to run another migration, we can add the attribute to our model.
             </p>
 
             <p>
@@ -158,22 +158,26 @@
             </p>
 
             <p>
-              Since validation occurs early on during the callback order, the field name needs to be slugified immediately prior to validation. That callback will also be called on updates to the field, which is necessary to keep the slug unique. The updated Field class in code:
+              Since validation occurs early on during the callback order, the field name needs to be slugified immediately prior to validation. That callback will also be called on updates to the field, which is necessary to keep the slug unique. The validation method should be scoped to the field's user_id. (The limited scope allows different users to have the same field/farm name.) The updated Field class in code:
             </p>
 
             <script src="https://gist.github.com/mattbechtel1/c524649b4ef38f483407a1b7ddd1c203.js"></script>
 
           </li>
         </ol>
+
+        <p>
+          With these methods in place, Succotash is no longer dependent on the frontend to manipulate data. Rails console commands, seed data, and RSpec tests will now be able to correctly produce the necessary children instances when a developer creates a new field.
+        </p>
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=Minimizing API Calls with Redis&amp;url=http://mattbechtel1.github.io/minimizing-external-api-calls-with-redis&amp;hashtags=web,dev,blog,soudev"
+        <a href="http://twitter.com/share?text=The Rails Object Lifecycle&amp;url=http://mattbechtel1.github.io/rails-object-lifecycle&amp;hashtags=web,dev,blog,soudev"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/minimizing-external-api-calls-with-redis"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/rails-object-lifecycle"
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -186,8 +190,8 @@
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/minimizing-external-api-calls-with-redis';
-        var disqus_title = 'Minimizing API Calls with Redis';
+        var disqus_identifier = '/rails-object-lifecycle';
+        var disqus_title = 'The Rails Object Lifecycle';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');

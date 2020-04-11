@@ -69,12 +69,16 @@
 
         <h4>Create</h4>
 
+        <p><em>
+          Update: The section below describes how to RESTfully cascade on create in a controller method. This works fine for view/frontend-only interaction. For RESTfully cascading in all situations, <a href='../rails-object-lifecycle/'>coding these cascades in the model is the superior option</a>.
+        </em></p>
+
         <p>
             Let's say we are building an app like <a href='http://succotash-app.herokuapp.com' target='_blank'>Succotash</a>. When a user creates a new field, we want to build out the associated subunits for that field, and then also a few initial stages (time periods) for the app. In this case, the field has many subunits (beds), which in turn have many stages. We need to cascade these creations and associate them all together, while only really receiving data for our top-level from the front-end.
         </p>
 
         <p>
-            The code below shows how we can create so many instances from just one request. Notice, however, that the beds and stages all are provided with what are essentially default values. (This code is a simplified version of what is used in the app.)
+            The code below shows how we can create so many instances from just one request. Notice, however, that the beds and stages all are provided with what are essentially default values. (This code is a simplified version of what is used in the live app.)
         </p>
 
         <script src="https://gist.github.com/mattbechtel1/5cafe29e0ea885bd821c14542b71a049.js"></script>
