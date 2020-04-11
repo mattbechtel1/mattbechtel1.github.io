@@ -86,128 +86,85 @@
         </p>
 
         <p>
-            Using a create command
+            The create method, besides being the most relevant to solving our controller problem, is a good example to walk through the lifecycle callbacks. For a simple create action (without any of the slugification and cascading creation of children that we have to deal with) will call the callback functions in the following order:
         </p>
 
-<pre class="prettyprint lang-bsh">
-<code>touch tmp/caching-dev.txt</code>
-</pre>
+        <ul>
+          <li><strong>before_validation</strong></li>
+          <li><em>Active Record runs through the model's validations. If validated, it continues with...</em></li>
+          <li><strong>after_validation</strong></li>
+          <li><strong>before_save</strong></li>
+          <li><strong>around_save</strong></li>
+          <li><strong>before_create</strong></li>
+          <li><strong>around_create</strong>: Requires a 'yield' call inside the block to actually go ahead with the process of creating the object.</li>
+          <li><strong>after_create</strong></li>
+          <li><strong>after_save</strong></li>
+          <li><em>Active Record commits the object to our database or rolls it back due to some error.</em></li>
+          <li><strong>after_commit / after_rollback</strong></li>
+        </ul>
 
         <p>
-            or:
-        </p>
-
-<pre class="prettyprint lang-bsh">
-<code>rails dev:cache</code>
-</pre>
-
-        <p>
-            Running the command <span class='command'>rails dev:cache</span> a second time will toggle caching off and remove the temp file.
-        </p>
-
-        <p>
-            Now that Rails knows we intend to cache data, we need to set it up to use Redis. In our development environment file, we need to change a variable. In the caching section, our environment file should include:
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/57e506ecbf6ab9237c6eb8133888810e.js"></script>
-
-        <p>
-            Most of this snippet is already provided, but we want to change our cache_store option to :redis_cache_store. I also changed the maximum age of the cache to 365 days, but you can choose what ever you would like when setting up your store. If you provide that field with an integer, Rails will assume you are providing the number of seconds.
+          As we will see below, Rails will be smart and move some of these around when it is appropriate to do so, but this is the basic order of callback functions. The 'save' callbacks will run on both create and update lifecycles, as will the validations. before_create, around_create, and after_create are replaced with their _update counterparts for updates. The validate callbacks are also called when we check if an instance is valid with .valid?
         </p>
 
         <p>
-            We also need to add a few gems to our gemfile to get Redis working. Our gemfile should now include:
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/02e869bfd0401d68753a4609c545201a.js"></script>
-
-        <p>Then, we run <span class='command'>bundle install</span> to install the gems.</p>
-
-        <p>
-            Lastly, we need to initialize an instance of Redis for our application. There are a number of options, including using a global variable or not initializing an instance at all and just calling <span class='command'>Rails.cache.redis</span> every time you need to access the Redis cache. I, however, prefer to create a new initializer file:
-        </p>
-          
-          <script src="https://gist.github.com/mattbechtel1/4cb6e6e6f73b5747ba8f1783f107ee7e.js"></script>
-          
-          <p>
-            <em>I use the <a href='https://github.com/laserlemon/figaro'>Figaro</a> gem to store environment variables in my projects and therefore use a application.yml file, but there are other, more common, Rails-centric ways to store environment variables.</em>
-          </p>
-
-        <p>
-            The password option should only be included if you set a password to access your Redis server (requirepass myRedisPassword). You can also pass it through at the end of your initializer file with Redis.current.auth(ENV["REDIS_PASSWORD"])
+          Callback functions are placed at the top of the model alongside either a method or Proc we wish to run at that point of the object lifecycle.
         </p>
 
         <p>
-            And lastly, we will need to run <span class="command">redis-server</span> from our command line to boot up our server.
+          With these callbacks added to our toolbelt, we can start rebuilding our models with parts taken from our bloated controller file.
         </p>
+
+
+        <h4>Putting Callbacks Into Practice</h4>
 
         <p>
-            With our cache store set up for use in Rails and Redis running, we are ready to manipulate our controller files to minimize our API calls.
+          What do we want to happen when someone creates a field in <a href='http://succotash-app.herokuapp.com' target='_blank'>Succotash</a>? We need to create and associate a given number of beds based on the provided parameters. We also need to then create two stages for each of those beds. It is not in the controller file above, but we also want to create a slug based on the field's name and validate that the user does not have another field with that same slug. All of these considerations, because they are not limited to frontend issues but also have important database concerns, should be attached the model.
         </p>
 
-        <h4>Dr. Redis</h4>
-        <h5>or: How I Learned to Stop Worrying and Love the JSON</h5>
+        <ol>
+          <li>
+            <p>
+              <u>Create a number of beds based on the parameters</u> - To be clear, most of the time when someone is playing with and testing our development code, they want to add as few parameters as possible, so we want to add a default value here. This will not have the affect of overwritting properly provided parameters (the "strong_params" in our controller). We can either add a default amount in a migration file to code it directly into our database, or, to avoid having to run another migration, we can add the attribute to our model.
+            </p>
 
-        <p>
-            I first implemented this caching pattern in a Rails API on a transit app I created that requests data from <a href='https://developer.wmata.com/' target='_blank'>WMATA's public API</a>. In the age of Covid-19, the app is not getting too much use at the moment, but WMATA does keep track of how many calls are made to their API endpoints. The default (free) tier is limited to 10 calls per second and 50,000 calls per day. If we ever start using public transit regularly again and my app becomes popular, I need to limit the number of calls to their endpoints. Redis allows me to cut the number of calls significantly.
-        </p>
+            <p>
+              That just leaves selecting the specific callback to use to create our beds during the field instance's create process. Since our bed needs to know to which field it belongs, we can only do so after our field has been created, so the after_create callback seems to fit the bill. The after_save callback does not work, because then Rails would also be creating beds on each update.
+            </p>
 
-        <p>
-            Our strategy is to cache responses on the first call and set the length of time the data will survive in our cache. My full transit app has <a href='https://github.com/mattbechtel1/Metrobus2020/blob/master/backend/config/routes.rb' target='_blank'>seven different routes</a> that connect (through a controller) to a unique endpoint of WMATA's API. And each of those endpoints has different considerations for how long we need to cache their response. For the endpoint that provides bus prediction data, we probably only want to cache the data for less than a minute, since that data will quickly become stale. For the endpoint that delivers us a list of different rail line names, we could keep that data cached until the Purple line opens in late 2022.
-        </p>
+            <p>
+              In code:
+            </p>
 
-        <p>
-          I will use the API call to the full list of bus routes as the first example. WMATA makes changes to their bus route list a little more often than the train lines list, so we probably want to make sure we get this refresh this data at least once per week. In our controller:
-        </p>
+            <script src="https://gist.github.com/mattbechtel1/b35b1ffa93133166ab83bcd3eab1a780.js"></script>
 
-        <script src="https://gist.github.com/mattbechtel1/6cba0ca9da6e5df9a900faacb4c5f0fa.js"></script>
+            <p>
+              If a developer calls <span class='command'>Field.create(user: someUserInstance)</span> in the Rails console, a field will be created and exactly one bed will be created and associated with that field. The 
+            </p>
+          </li>
 
-        <p>
-          So, first we check to see if our Redis instance has already stored data associated with our key ('allBuses'). If not, we complete the API call as normal, which returns a JSON object. We then set the JSON object as the value for our 'allBuses' key and set an expiration time of one week (604,800 seconds).
-        </p>
+          <li>
+            <p>
+              <u>Create exactly two stages for each bed</u> - The process for creating the beds for the field can be directly applied to creating the stages for the beds, only this time, we do not even have to consider any parameters.
+            </p>
 
-        <p>
-          Redis defaults to storing string values, but it can also manage to store hashes, lists, and sets with only <a href='https://redis.io/commands/hset' target='_blank'>slightly different commands</a>. It may be tempting to convert our JSON response to a hash or list to store in Redis, then. But let's take a moment to consider what that would require our method to do. First we would need to parse our JSON object and convert it into an array. Then we would need to iterate through that array of bus routes, create something (an integer?) to use as a namespaced key, that will point to another series of key-value pairs that hold the data fields we got back for each bus route, where the key becomes a second namespace and our first key suddenly looks something like 'allBuses:0' to pass in different keys (RouteId, etc) to come up with a value of '10A'. That's awfully complicated. Key-value databases like Redis are not designed to store nested hashes. Plus, our entire goal with using a cache is to save time on our subsequent calls. Adding the time complexity of loops to pack or unpack our Redis hash and parse or construct our JSON objects is going to cut deeply into, if not completely undo, whatever time we saved with our cache store.
-        </p>
+            <script src="https://gist.github.com/mattbechtel1/bd4d17c267a7d182f139d40b5d172012.js"></script>
 
-        <p>
-          But... what exactly does Ruby think that JSON response's datatype is? A string! We don't need to convert our JSON into something Ruby can iterate over. Unpacking that data is our frontend's problem. Our Redis instance can store the ugly JSON string as the value for the 'allBuses' key.
-        </p>
+          </li>
 
-        <p>
-          What kind of time does this save? Let's call the bus_route_list method twice and find out.
-        </p>
+          <li>
+            <p>
+              <u>Create a slug for the field and validate it</u> - Ruby's parameterize method can create the slug based on the field's name. The question is more about when and how we go about adding the slug as an attribute to our field.
+            </p>
 
-<pre class="prettyprint lang-bsh">
-<code>
-# call method with Redis key not yet existing
-  Processing by MetroController#bus_route_list as */*
-  Completed 200 OK in 150ms (Views: 0.2ms | ActiveRecord: 0.0ms | Allocations: 1288)
+            <p>
+              Since validation occurs early on during the callback order, the field name needs to be slugified immediately prior to validation. That callback will also be called on updates to the field, which is necessary to keep the slug unique. The updated Field class in code:
+            </p>
 
-# call method again finding the Redis key and returning the cached data
-  Processing by MetroController#bus_route_list as */*
-  Completed 200 OK in 2ms (Views: 0.1ms | ActiveRecord: 0.0ms | Allocations: 145)
-</code>
-</pre>
+            <script src="https://gist.github.com/mattbechtel1/c524649b4ef38f483407a1b7ddd1c203.js"></script>
 
-        <p>
-          We went from 150ms to get a 200 response down to just 2ms, and from 1288 memory allocations to 145! We have saved fairly significant time and space with our cache in addition to saving 1 request on our monthly and per second API call limits.
-        </p>
-
-        <p>
-          The bus_route_list method is similar to an index method in a more RESTful Rails API controller. It delivers an array and does not need to read any parameters to deliver that array. For methods that require us to send along a parameter, we can store that parameter as part of the key. In the same controller class, we can call the WMATA API endpoint that provides us a list of upcoming bus arrivals when provided with a bus stop's id:
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/695524388b37935e979bc5b75f7a2ec9.js"></script>
-
-        <p>
-           By using the parameter for the bus stop ID as part of the key, we can potentially store as many as keys as WMATA has unique bus stops.
-        </p>
-
-        <p>
-          Because of how frequently the WMATA API updates bus arrivals, we set the key-value pair to expire after only 20 seconds. While the expiration time was used in both of the examples above, it is not required that we use this option. If we do not set an expiration time limit, the key will not expire until either a) Redis runs out of space and your <a href='https://redis.io/topics/lru-cache'>eviction policy</a> removes the key or b) you manually delete it.
-        </p>
-
+          </li>
+        </ol>
     </section>
     <div class="post-content">
       <aside class="share">
