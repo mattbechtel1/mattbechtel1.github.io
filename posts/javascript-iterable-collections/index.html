@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> JavaScript Iterable Collections | Hello, World extended </title>
+  <meta name="description" content="Iterable Collections in JavaScript">
+  <meta name="keywords" content="javascript, caching, objects, collections">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">Map and Set: JavaScript's Iterable Collections</h1>
+          <p class="post-meta">April 18, 2020</p>
+        </header>
+        <h4>Arrays are Bad</h4>
+        <p>
+            Arrays are bad.
+        </p>
+
+        <h4>Really? That's the entire section?</h4>
+
+        <p>
+            I didn't think it needed explaination, but if we must:
+        </p>
+
+        <p>
+            As programmers, when we are asked to iterate over a set of data, we immediately assume that the input we will be iterating over is an array. Compared to that other basic structure, the object-hash-dictionary-hashmap-whateverYourLanguageCallsIt, arrays are somewhat nice to iterate over because the computer just has to do some addition to figure out where your data is stored. The computer (and other programmers) have given us <a href='../javascript-iterators/'>plenty of tools</a> aimed at iterating over a declared array. They're also JSON friendly, and you, as a programmer, don't need to spend mental energy thinking about what you want to set as the key pointing to each datapoint. It'll be a set of consecutive integers starting at 0.
+        </p>
+
+        <p>
+            There a plenty of things arrays are poorly suited for, however:
+            <ul>
+                <li>
+                    <u>Arrays have a really difficult time knowing when data is repeated.</u> There are certainly plenty of times where we need to push data into an array and check either during or after the process that we only have unique values. That will require at least one additional loop through the array, and if we want to get our unique items in anything less than O(n<sup>2</sup>), we are going to use a non-array structure in that process anyway.
+                </li>
+                <li>
+                    <u>Arrays don't remember the purpose of their data.</u> The advantage of a programmer not having to think up a key for each datapoint is that... the data points end up not having useful keys.
+                </li>
+                <li>
+                    <u>Removing items from an array is not programmatically easy.</u> Unless you are removing the final (pop) or first (shift) item from an array, you are going to need to write a function that can target the data you want to remove. Then, the computer needs to shift all the other data points after your removed item around (and this goes for when you shift the first item off as well). That's an entire additional iteration through your array, which could be a noticable amount of time for a large array.
+                </li>
+                <li>
+                    <u>Removing items from an array is semantically ugly.</u> Let me know in the comments which of these things is prettier code that a novice JavaScripter would understand. I can't decide:
+
+                    <script src="https://gist.github.com/mattbechtel1/f8259caf5cf8c4c437aa9a41b477a5b1.js"></script>
+
+                    And only one of those actually bothers with manipulating the original array. The others add a new copy.
+                </li>   
+        </p>
+        
+        <p>
+            But we know that we can iterate over JavaScript objects as well with <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in' target='_blank'>for-in loops</a>. Thanks to the magic of hash functions, we can access data in our collection easily. But, the idea of an 'object' does not semantically suggest that it is, in fact, something iterable. And, unlike arrays, objects do not have a set order, which is helpful in many circumstances.
+        </p>
+
+        <p>
+            As of ES6, JavaScript now includes a few built-in objects that combine the key-based lookup and unfussy deletion properties of objects with the ease of iteration and saved chronology of arrays: the Set and Map classes.
+        </p>
+
+        <h4>Set</h4>
+
+        <p>
+            The solution is to move this logic into our models. That way, whether it's a user on the frontend or someone calling <span class='command'>Field.create()</span> in a seed file or the console, we should be able to produce a field with beds, each of which have two default stages.
+        </p>
+
+        <h4>Rails Object Lifecycle Callbacks</h4>
+
+        <p>
+            I covered the basics of the object lifecycle in the previous cascade blog. Objects are created, updated, and destroyed. (They are also saved and touched.) But a lot of the work Rails does is around those steps in the lifecycle. Validations, both those we specifically declare and ones the database and Rails framework require, are checked when we create or update.
+        </p>
+
+        <p>
+            Create, update, and destroy are just the main points in an object's lifecycle. Rails and Active Record allow us to run methods right before and after each of those lifecycle points. Active Record refers to these options as callbacks. A full list of the 19 available callbacks can be found in the <a href='https://guides.rubyonrails.org/active_record_callbacks.html#available-callbacks', touch="_blank">Rails documentation</a>.
+        </p>
+
+        <p>
+            The create method, besides being the most relevant to solving our controller problem, is a good example to walk through the lifecycle callbacks. For a simple create action (without any of the slugification and cascading creation of children that we have to deal with) will call the callback functions in the following order:
+        </p>
+
+        <ul>
+          <li><strong>before_validation</strong></li>
+          <li><em>Active Record runs through the model's validations. If validated, it continues with...</em></li>
+          <li><strong>after_validation</strong></li>
+          <li><strong>before_save</strong></li>
+          <li><strong>around_save</strong></li>
+          <li><strong>before_create</strong></li>
+          <li><strong>around_create</strong>: Requires a 'yield' call inside the block to actually go ahead with the process of creating the object.</li>
+          <li><strong>after_create</strong></li>
+          <li><strong>after_save</strong></li>
+          <li><em>Active Record commits the object to our database or rolls it back due to some error.</em></li>
+          <li><strong>after_commit / after_rollback</strong></li>
+        </ul>
+
+        <p>
+          As we will see below, Rails will be smart and move some of these around when it is appropriate to do so, but this is the basic order of callback functions. The 'save' callbacks will run on both create and update commands on the lifecycle, as will the validations. before_create, around_create, and after_create are replaced with their _update counterparts for the update command. The validate callbacks are also called when we check if an instance is valid with .valid?
+        </p>
+
+        <p>
+          Callback functions are placed at the top of the model alongside either a method or Proc we wish to run at that point of the object lifecycle.
+        </p>
+
+        <p>
+          With these callbacks added to our toolbox, we can start rebuilding our models with parts taken from our bloated controller file.
+        </p>
+
+
+        <h4>Putting Callbacks Into Practice</h4>
+
+        <p>
+          What do we want to happen when someone creates a field in <a href='http://succotash-app.herokuapp.com' target='_blank'>Succotash</a>? We need to create and associate a given number of beds based on the provided parameters. We also need to then create two stages for each of those beds. It is not in the controller file above, but we also want to create a slug based on the field's name and validate that the user does not have another field with that same slug. All of these considerations, because they are not limited to frontend issues but also have important database concerns, should be attached the model.
+        </p>
+
+        <ol>
+          <li>
+            <p>
+              <u>Create a number of beds based on the parameters</u> - To be clear, most of the time when someone is playing with and testing our development code, they want to add as few parameters as possible, so we want to add a default value here. This will not have the affect of overwriting properly provided parameters (the "strong_params" in our controller). We can either add a default amount in a migration file to code it directly into our database, or, to avoid having to run another migration, we can add the attribute to our model.
+            </p>
+
+            <p>
+              That just leaves selecting the specific callback to use to create our beds during the field instance's create process. Since our bed needs to know to which field it belongs, we can only do so after our field has been created, so the after_create callback seems to fit the bill. The after_save callback does not work, because then Rails would also be creating beds on each update.
+            </p>
+
+            <p>
+              In code:
+            </p>
+
+            <script src="https://gist.github.com/mattbechtel1/b35b1ffa93133166ab83bcd3eab1a780.js"></script>
+
+            <p>
+              If a developer calls <span class='command'>Field.create(user: someUserInstance)</span> in the Rails console, a field will be created and exactly one bed will be created and associated with that field. The 
+            </p>
+          </li>
+
+          <li>
+            <p>
+              <u>Create exactly two stages for each bed</u> - The process for creating the beds for the field can be directly applied to creating the stages for the beds, only this time, we do not even have to consider any parameters.
+            </p>
+
+            <script src="https://gist.github.com/mattbechtel1/bd4d17c267a7d182f139d40b5d172012.js"></script>
+
+          </li>
+
+          <li>
+            <p>
+              <u>Create a slug for the field and validate it</u> - Ruby's parameterize method can create the slug based on the field's name. The question is more about when and how we go about adding the slug as an attribute to our field.
+            </p>
+
+            <p>
+              Since validation occurs early on during the callback order, the field name needs to be slugified immediately prior to validation. That callback will also be called on updates to the field, which is necessary to keep the slug unique. The validation method should be scoped to the field's user_id. (The limited scope allows different users to have the same field/farm name.) The updated Field class in code:
+            </p>
+
+            <script src="https://gist.github.com/mattbechtel1/c524649b4ef38f483407a1b7ddd1c203.js"></script>
+
+          </li>
+        </ol>
+
+        <p>
+          With these methods in place, Succotash is no longer dependent on the frontend to manipulate data. Rails console commands, seed data, and RSpec tests will now be able to correctly produce the necessary children instances when a developer creates a new field.
+        </p>
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=The Rails Object Lifecycle&amp;url=http://mattbechtel1.github.io/rails-object-lifecycle&amp;hashtags=web,dev,blog,soudev"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/rails-object-lifecycle"
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/rails-object-lifecycle';
+        var disqus_title = 'The Rails Object Lifecycle';
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
