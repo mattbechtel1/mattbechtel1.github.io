@@ -71,11 +71,11 @@
         <h4>Really? That's the entire section?</h4>
 
         <p>
-            I didn't think it needed explaination, but if we must:
+            I didn't think it needed explanation, but if we must:
         </p>
 
         <p>
-            As programmers, when we are asked to iterate over a set of data, we immediately assume that the input we will be iterating over is an array. Compared to that other basic structure, the object-hash-dictionary-hashmap-whateverYourLanguageCallsIt, arrays are somewhat nice to iterate over because the computer just has to do some addition to figure out where your data is stored. The computer (and other programmers) have given us <a href='../javascript-iterators/'>plenty of tools</a> aimed at iterating over a declared array. They're also JSON friendly, and you, as a programmer, don't need to spend mental energy thinking about what you want to set as the key pointing to each datapoint. It'll be a set of consecutive integers starting at 0.
+            As programmers, when we are asked to iterate over a set of data, we immediately assume that the input we will be iterating over is an array. Compared to that other basic structure, the object-hash-dictionary-hashmap-whateverYourLanguageCallsIt, arrays are somewhat nice to iterate over because the computer just has to do some addition to figure out where your data is stored. The computer (and other programmers) have given us <a href='../javascript-iterators/'>plenty of tools</a> aimed at iterating over a declared array. They're also JSON friendly, and you, as a programmer, don't need to spend mental energy thinking about what you want to set as the key pointing to each data point. It'll be a set of consecutive integers starting at 0.
         </p>
 
         <p>
@@ -85,10 +85,10 @@
                     <u>Arrays have a really difficult time knowing when data is repeated.</u> There are certainly plenty of times where we need to push data into an array and check either during or after the process that we only have unique values. That will require at least one additional loop through the array, and if we want to get our unique items in anything less than O(n<sup>2</sup>), we are going to use a non-array structure in that process anyway.
                 </li>
                 <li>
-                    <u>Arrays don't remember the purpose of their data.</u> The advantage of a programmer not having to think up a key for each datapoint is that... the data points end up not having useful keys.
+                    <u>Arrays don't remember the purpose of their data.</u> The advantage of a programmer not having to think up a key for each data point is that... the data points end up not having useful keys.
                 </li>
                 <li>
-                    <u>Removing items from an array is not programmatically easy.</u> Unless you are removing the final (pop) or first (shift) item from an array, you are going to need to write a function that can target the data you want to remove. Then, the computer needs to shift all the other data points after your removed item around (and this goes for when you shift the first item off as well). That's an entire additional iteration through your array, which could be a noticable amount of time for a large array.
+                    <u>Removing items from an array is not programmatically easy.</u> Unless you are removing the final (pop) or first (shift) item from an array, you are going to need to write a function that can target the data you want to remove. Then, the computer needs to shift all the other data points after your removed item around (and this goes for when you shift the first item off as well). That's an entire additional iteration through your array, which could be a noticeable amount of time for a large array.
                 </li>
                 <li>
                     <u>Removing items from an array is semantically ugly.</u> Let me know in the comments which of these functions is the prettiest code for a novice JavaScripter to understand. I can't decide:
@@ -128,7 +128,7 @@
         </p>
 
         <p>
-          Unlike an array, nothing is repeated. We could call <span class='command'>fruits.add(5)</span> all day, but there would only be one occaision of 5 in our set.
+          Unlike an array, nothing is repeated. We could call <span class='command'>fruits.add(5)</span> all day, but there would only be one occasion of 5 in our set.
         </p>
 
         <p>
@@ -144,7 +144,7 @@
         <h4>Map</h4>
 
         <p>
-          While sets are great at remembering their contents, sometimes programmers need a full key-value pair for their data. Sets are limited in that we cannot reach into an object plcaed a set and return values of that object's keys. Thus, we have Map.
+          While sets are great at remembering their contents, sometimes programmers need a full key-value pair for their data. Sets are limited in that we cannot reach into an object placed a set and return values of that object's keys. Thus, we have Map.
         </p>
 
         <p>
@@ -152,7 +152,7 @@
 
           <ul>
             <li>
-              <u>Maps do not come with any of the built in default keys that objects do.</u> The object prototype has some default keys that can collide. Object.clear() is a prototype function; so if we were to create a key called 'clear' on our object, we could create problems down the line. Maps seperate these issues by placing our key-value pairs one level down from its built-in keys.
+              <u>Maps do not come with any of the built in default keys that objects do.</u> The object prototype has some default keys that can collide. Object.clear() is a prototype function; so if we were to create a key called 'clear' on our object, we could create problems down the line. Maps separate these issues by placing our key-value pairs one level down from its built-in keys.
             </li>
 
             <li>
@@ -184,7 +184,7 @@
         <script src="https://gist.github.com/mattbechtel1/a35a818229d5c4db3660221ee5bb09a0.js"></script>
 
         <p>
-          The .get and .set methods are used to retreive and introduce/edit key-value pairs, just like any good caching database. The iteration at the end also produces the data in the same order their keys were placed in the map. .size checks on the number of keys available to our map and .has checks on the existance of the key.
+          The .get and .set methods are used to retrieve and introduce/edit key-value pairs, just like any good caching database. The iteration at the end also produces the data in the same order their keys were placed in the map. .size checks on the number of keys available to our map and .has checks on the existence of the key.
         </p>
 
         <p>
@@ -194,7 +194,6 @@
         <p>
           While maps allow objects and functions to be used as keys, the usefulness of that option is limited, since objects and functions won't be === to a similar object/function.
         </p>
-
 
     </section>
     <div class="post-content">
