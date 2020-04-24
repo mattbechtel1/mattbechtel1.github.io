@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Two Cardinal Rules of Programming | Hello, World extended </title>
+  <meta name="description" content="Read the Stack and Test Early">
+  <meta name="keywords" content="testing, rspec, errors, programming">
+  <link rel="stylesheet" href="/css/main.css">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="theme-color" content="#2ecc71">
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autoload=true&skin=sunburst"></script>
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-52446115-1']);
+    _gaq.push(['_trackPageview']);
+    (function () {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+
+<body class="single">
+  <main class="container">
+    <header class="site-header">
+      <div class="container txt-center">
+        <nav class="navbar">
+          <ul>
+            <li><a href="/">home</a></li>
+            <li class="divider">&bull;</li>
+            <li><a href="/about">about</a></li>
+          </ul>
+        </nav>
+        <a href="/" class="author-thumb">
+          <img src="/images/author.jpg" alt="Author thumbnail" class="dot">
+        </a>
+        <h1>Hello, World extended <small>...</small></h1>
+
+        <hr class="hr">
+      </div>
+    </header>
+    <section class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">How I Wasted Two Days By Not Following Two of the Cardinal Rules of Programming</h1>
+          <p class="post-meta">April 24, 2020</p>
+        </header>
+        <h4>Cardinal Rule #1: Test Early and Often</h4>
+
+        <p>
+            My <a href='https://succotash-app.herokuapp.com/' target='_blank'>Succotash farm management application</a> was first built as a final capstone project for my time at the Flatiron School with v1.0.1 being released and deployed the day of the final presentation. I had only about 2.5 weeks to get a version that was presentation ready.
+        </p>
+
+        <p>
+            With the crazy sprint to go from a framework to multi-model application with more-or-less a one-person time, some standard agile techniques had to fall by the wayside. In the case of Succotash, an obvious candidate for skipping was the testing process. 
+        </p>
+
+        <p>
+            Here we are ten weeks later, and Succotash v1.0 is already deployed on its 8th patch. Many of the recent patches, particularly to the Rails backend, are for the benefit of developers rather than users. It is my poor attempt to invite others to get involved. The next step, then, is to add tests to ensure that other developers do not make changes that adversely affect the existing models and controllers.
+        </p>
+
+        <p>
+            I decide to use RSpec, read a few blogs, add what seem like the necessary gems, (foolishly update the app's Ruby version to 2.7), set up a few very basic tests for the simplest controller class, and run the test... and it all falls apart.
+        </p>
+
+        <p>
+            First of all, because of the Ruby version update, I was getting some really ugly stack trace write outs every time I would boot a Rails server or run a Rails console. Some stack overflow searches suggested that it is not a real problem: some syntax patterns had been depreciated and Rails has not been updated its own file's syntax to adjust. But I get fed up enough with the stack trace that I revert to the Ruby 2.6.1 version with which Succotash's API originally built.
+        </p>
+
+        <p>
+            But my simple RSpec file still was not running. Blogs are telling me to bundle all kinds of new, unfamiliar gems into my API, some of which had outright been renamed. <em>*cough*FactoryGirl.*cough*</em> Considering the recent reports of <a href='https://arstechnica.com/information-technology/2020/04/725-bitcoin-stealing-apps-snuck-into-ruby-repository/' target='_blank'>malicious gems preying on poor spellers</a>, getting the right gems for your project is incredibly important.
+        </p>
+
+        <p>
+            Blogs are an awesome resource, especially for Ruby-related topics, given the community's reputation for kindness and helpfulness. But sometimes, it is just better to go to the source, especially when you have 3 blogs are telling you to make 3 different changes to the configuration file that RSpec kindly gives you when you run <span class='command'>rails g rspec:install</span>.
+        </p>
+
+        <p>
+            Back to basics, then. The <a href='https://github.com/rspec/rspec-rails'>>RSpec-Rails repository's readme file on Github</a> has all the necessary information to get RSpec installed with only the features you need, and the <a href='https://relishapp.com/rspec/rspec-rails/v/4-0/docs'>RSpec official documentation</a> is easy enough to read to one started on writing tests.
+        </p>
+
+        <p>
+            While I did complicate things a bit by using FactoryBot, it was not appear to be the source of any problems. I appeared to be ready to try RSpec again. That's when things really went downhill.
+        </p>
+
+        <p>
+            The lesson though is, while it is almost always possible to retrofit basic functionalities and features back into your code after spending months working on improving your project--<a href='../retrofitting-pgadmin-to-an-app/'>and this blog has  covered one such instance in depth</a>--there is usually a reason that some of these features are built into basic application generators. It can be really hard to debug problems when you add them later, especially when those features' primary purpose is to assist with debugging. My problems with retrofitting RSpec are in hindsight obvious, but I was checking all sorts of configuration files and modal classes to get there. There would have been far less ambiguity on where to look had I just started designing tests near the outset.
+        </p>
+
+        <h4>Cardinal Rule #2: Read the Damn Stack Trace</h4>
+
+        <p class='command'>
+            rspec spec/models/crops_spec.rb
+        </p>
+
+<pre class="prettyprint" id='trace'>
+    <code>
+An error occurred while loading ./spec/models/crops_spec.rb.
+Failure/Error: require File.expand_path('../config/environment', __dir__)
+
+TypeError:
+    no implicit conversion of nil into String
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:300:in `quote'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:300:in `block in origins'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:293:in `map'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:293:in `origins'
+# ./config/initializers/cors.rb:10:in `block (2 levels) in main'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:60:in `instance_eval'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:60:in `allow'
+# ./config/initializers/cors.rb:9:in `block in main'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:45:in `instance_eval'
+# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:45:in `initialize'
+...
+    </code>
+</pre>
+
+        <p>
+            The first line here (File.expand_path(...)), comes from the rails_helper.rb file that is created when running the command <span class='command'>rails g rspec:install</span>. It had come up often in my earlier debugging as well, because one of those final arguments reaches down into the depths of Rails' system and pokes one of the Rails methods using a syntax that was depreciated in Rails 2.7. It is a single line that was for a couple days extremely confounding. Since this is a line of code that, as a provided configuration, I was trying ever so hard to avoid editing.
+        </p>
+
+        <p>
+            This, of course, led me on another search through Stack Overflow. I stumbled upon <a href='https://stackoverflow.com/a/52990486' target='_blank'>this Stack Overflow answer</a>, which works, but was not an answer that I found to be sufficient, nor was the questioner's stack trace the same as mine. At the very least, it allowed me to finally work on my actual tests. But, again, if my goal is to set up tests for the benefit of other developers, asking them to run a non-standard command to run tests was not an acceptable solution.
+        </p>
+
+        <p>
+            I could finally test my tests, and that was the main priority for a while. It took some time to return to the issue and a lot of unnecessary <span class='command'>bundle exec rake spec</span> in the meantime.
+        </p>
+
+        <p>
+          A poor configuration somewhere? More problems with depreciated methods? Not understanding how some other gems like FactoryBot or Database-Cleaner mess with the system? The scenarios were pretty hard to debug for someone really just trying to get RSpec working for the first time. Or maybe...
+        </p>
+
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/nFuxpphnN0k?start=16" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+        <p>
+            <a href='#trace'>Let's look at that stack trace again.</a> If you have done any development in Rails, you have probably seen a similar output a couple dozen times. It is the message that appears whenever you have a problem with your CORS configuration. But we're not working in an environment that needs to limit access. Tests are run in the test environment to preserve our development database. Why would CORS be an issue?
+        </p>
+
+        <p>
+            Because the Rails application has an initializer that requires a string as an allowed origin and will not boot in any circumstance without one. The development and production environments are still working, but the test environment is not. The stack trace points us to cors.rb line 10.
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/c3754044bbfb158913f95c7efccba4e2.js"></script>
+
+        <p>
+          And the application.yml file that Figaro is looking at:
+        </p>
+
+        <script src="https://gist.github.com/mattbechtel1/69b0be129afded68d6e40befc68c7651.js"></script>
+
+        <p>
+            And there it is, just like the stack trace was telling us all along. Rails cannot convert a nil to a string, and because the allowed_origin variable for the test environment is nil, CORS does not know how to handle HTTP requests. Adding an allowed_origin variable for the test environment solves the problem.
+        </p>
+
+        <p>
+            I spent a total of two days smashing these bugs despite it really only taking following one of two cardinal rules of programming to solve or shorten the amount of wasted time. I could have either started testing when the application was smaller or simply read the damn stack trace, and my problems would have been limited to a few hours at most.
+        </p>
+
+    </section>
+    <div class="post-content">
+      <aside class="share">
+        <span>Share this: </span>
+        <a href="http://twitter.com/share?text=Two Cardinal Rules of Programmingsamp;url=http://mattbechtel1.github.io/posts/test-first&amp;hashtags=web,dev,blog"
+          onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="icon icon-twitter-rounded"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/test-first
+          onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="icon icon-facebook-rounded"></i>
+        </a>
+      </aside>
+    </div>
+    <hr>
+    <aside id="comments" class="disqus">
+      <h3>Comments</h3>
+
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'hello-world-extended';
+        var disqus_identifier = '/test-first';
+        var disqus_title = 'Two Cardinal Rules of Programming';
+        var disqus_url = 'http://mattbechtel1.github.io';
+        (function () { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://hello-world-extended.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+          Disqus.</a></noscript>
+
+
+    </aside>
+    </article>
+    </section>
+    <div class="clearfix"></div>
+    <footer class="site-footer txt-center">
+      <hr>
+      <ul class="social">
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://github.com/mattbechtel1" target="_blank"><i class="icon icon-github"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://twitter.com/mattbechtel1" target="_blank"><i class="icon icon-twitter"></i></a></li>
+        <li><a href="" target="_blank"><i class="icon icon-"></i></a></li>
+        <li><a href="http://linkedin.com/in/mbechtel" target="_blank"><i class="icon icon-linkedin"></i></a></li>
+      </ul>
+      <small>&copy; 2020 All rights reserved. Made with <a href="http://jekyllrb.com" target="_blank">Jekyll</a> and <i
+          class="icon icon-heart"></i></small>
+      <small>by <a href="http://nandomoreira.me" target="_blank">nandomoreira.me</a></small>
+    </footer>
+  </main>
+  </main> 
+</body>
+
+</html>
