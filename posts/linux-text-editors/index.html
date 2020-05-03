@@ -1,4 +1,4 @@
-<!DOCTYPE htm	`l>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -55,122 +55,96 @@
         <h4>Battlefield History</h4>
 
         <p>
-            Programmers can have some pretty strong opinions about their preferred environment to work. Open vs. closed; standings vs. sitting; IDE vs. other IDE; Atom vs. Visual Studio. But few of these arguments have inspired the  passions of the editor wars. <a href='https://www.gnu.org/fun/jokes/gospel.html' target='_blank'>Proponents of an editor can sometimes reach a level of religious fanatacism.</a>
+            Programmers can have some pretty strong opinions about their preferred environment to work. Open vs. closed; standings vs. sitting; IDE vs. other IDE; Atom vs. Visual Studio. But few of these arguments have inspired the  passions of the editor wars. <a href='https://www.gnu.org/fun/jokes/gospel.html' target='_blank'>Proponents of an editor can sometimes reach a level of religious fanaticism.</a>
         </p>
 
         <p>
-            My opinion, which should not be any surprise to people who are familiar with me, is that it is just characters on a screen and who really cares how you manipulate them? I am only on the second paragraph of this blog, and I have already used three different text editors to edit this blog. The passions involved are ccompletely out of range for different products that all work fairly. But, in the interest of thoroughness, I plan to cover the three of the primary Linux text editors.       </p>
-
-        <p>
-		The war between proponents of two of these editors, vi and Emacs, goes back to the late 1980's, but text editor wars may actually go back to the end of the 1960's with even more basic text editing software. Those programs would eventually evolve into the more fullsome text editors that developed in the 70's and 80's are still largely in use today. For someone just starting out in Linux, it is probably best to focus on one editor, learn it well, and become the best developer one can be. But, it is not that simple. Choosing a text editor is not just installing a program, it is choosing a side in a war.
+            My opinion, which should not be any surprise to people who are familiar with me, is that it is just characters on a screen and who really cares how you manipulate them? I am only on the second paragraph of this blog, and I have already used three different text editors to edit this blog. The passions involved are completely out of range for different products that all work fairly. But, in the interest of thoroughness, I plan to cover the three of the primary Linux text editors.
         </p>
 
         <p>
-            I decide to use RSpec, read a few blogs, add what seem like the necessary gems, (foolishly update the app's Ruby version to 2.7), set up a few very basic tests for the simplest controller class, and run the test... and it all falls apart.
+		      The war between proponents of two of these editors, vi and Emacs, goes back to the late 1980's, but text editor wars may actually go back to the end of the 1960's with even more basic text editing software. Those programs would eventually evolve into the more fulsome text editors that developed in the late 20th Century and are still largely in use today. For someone just starting out in Linux, it is probably best to focus on one editor, learn it well, and become the best developer one can be. But, it is not that simple. Choosing a text editor is not just installing a program, it is choosing a side in a war.
+        </p>
+
+        <h4>Vim</h4>
+
+        <p>
+            <a href="https://www.vim.org/" target="_blank">Vim</a> is a clone of the earlier Vi editor, but with added features. Vim gets its name from Vi; it means VI iMproved. While Vi has been around since the 1970's, Vim was released as free and open-source software in 1991. Vim can be opened with the simple <span class="command">vim</span> command, but that really just brings up a description screen. Better would be to provide a file directory and name as an argument. Providing an existing file (<span class="command">vim myFile.html</span>) will open it in Vim, while providing a new file name will create it as a .txt swap file until you formally save it.
         </p>
 
         <p>
-            First of all, because of the Ruby version update, I was getting some really ugly stack trace write outs every time I would boot a Rails server or run a Rails console. Some stack overflow searches suggested that it is not a real problem: some syntax patterns had been depreciated and Rails has not been updated its own file's syntax to adjust. But I get fed up enough with the stack trace that I revert to the Ruby 2.6.1 version with which Succotash's API originally built.
+	        Vim has seven modes total, but there are really only three we need to worry about for this basic introduction. Normal mode is how a file is displayed when the documented is opened in Vim. It is useful for reading a file, but is frankly less useful than simple Linux commands like <span class="command">more myFile.txt</span>, <span class="command">less myFile.txt</span>, or <span class="command">cat myFile.txt</span>. 
+        </p>
+
+	      <p>
+	        The most useful for writing is the insert mode, which acts most like a word processor or code editor. The target at which your are entering or deleting text is displayed clearly on the screen and it can be moved with the arrows on the keyboard or the 'h','j','k', and 'l' keys. Entering insert mode is as easy as typing 'i', while a programmer can return to normal mode with the 'esc' button.
+	      </p>
+
+        <p>
+          Moving back and forth between insert and normal mode is non-trivial. It is much easier to skip around the document in normal mode than with insert. Navigation by word, line, and sentence is possible in normal mode, and normal mode provides access to ends of lines and beginnings of lines with a keystroke. Such navigation is not available during insert, so vim users train themselves to always go back to normal mode when not typing. Saving and exiting the file must also take place from normal mode. 
         </p>
 
         <p>
-            But my simple RSpec file still was not running. Blogs are telling me to bundle all kinds of new, unfamiliar gems into my API, some of which had outright been renamed. <em>*cough*FactoryGirl.*cough*</em> Considering the recent reports of <a href='https://arstechnica.com/information-technology/2020/04/725-bitcoin-stealing-apps-snuck-into-ruby-repository/' target='_blank'>malicious gems preying on poor spellers</a>, getting the right gems for your project is incredibly important.
+          Visual mode is useful for removing large blocks of text or changing indentations. Practically, most visual mode actions can take place in other modes, but visual mode allows for the visualization of selecting a block of code, so it is particularly useful in pair programming. Visual mode can be entered with 'v'.
         </p>
 
         <p>
-            Blogs are an awesome resource, especially for Ruby-related topics, given the community's reputation for kindness and helpfulness. But sometimes, it is just better to go to the source, especially when you have 3 blogs are telling you to make 3 different changes to the configuration file that RSpec kindly gives you when you run <span class='command'>rails g rspec:install</span>.
+	        Other modes include one where text can be manipulated from the command line, and a select mode, where characters are replaced as you type.
         </p>
 
         <p>
-            Back to basics, then. The <a href='https://github.com/rspec/rspec-rails'>RSpec-Rails repository's readme file on Github</a> has all the necessary information to get RSpec installed with only the features you need, and the <a href='https://relishapp.com/rspec/rspec-rails/v/4-0/docs'>RSpec official documentation</a> is easy enough to read to one started on writing tests.
+	        One downside of Vim is that learning all the necessary commands can be daunting. Fortunately, the <scan class="command">vimtutor</span> command provides a very good summation of the most important topics for learning Vim.
+	      </p>
+
+        <p>
+          Saving a file from normal mode can be done with <span class="command">:w</span> and leaving Vim requires <span class="command">:q</span>. The two commands can be combined with <span class="command">:wq</span>. Before the file is saved, it is stored in a swap file, which is convenient if something goes sideways. 
+        </p>
+
+        <h4>Emacs</h4>
+
+        <p>
+           Emacs is a family of text editors, the most used one being <a href="https://www.gnu.org/software/emacs/" target="_blank">GNU Emacs</a>. Emacs was first released in 1976, making it one of the oldest open-sourced projects that is still maintained. It uses a separate environment than the standard terminal in which the other options discussed here open, making it more similar to VS Code, Atom, or Microsoft Word than its other UNIX-counterparts. Holding shift down while moving the cursor with the arrow keys will highlight the text, for example. There are also syntax coloring features that Vim could only imagine.
         </p>
 
         <p>
-            While I did complicate things a bit by using FactoryBot, it was not appear to be the source of any problems. I appeared to be ready to try RSpec again. That's when things really went downhill.
+          The other defining feature of Emacs is the frequent use of a control key to conduct operations. Ctrl + x is pretty much required before any major operation: saving, exiting, etc. Combined with the alt key, navigating through Emacs is also a two-key process. The advantages, compared to Vim, is that moving between modes is not required. Using the key combinations to move from one word or line to another or add tabs, there is no switching between modes to enter text.
         </p>
 
         <p>
-            The lesson though is, while it is almost always possible to retrofit basic functionalities and features back into your code after spending months working on improving your project--<a href='../retrofitting-pgadmin-to-an-app/'>and this blog has  covered one such instance in depth</a>--there is usually a reason that some of these features are built into basic application generators. It can be really hard to debug problems when you add them later, especially when those features' primary purpose is to assist with debugging. My problems with retrofitting RSpec are in hindsight obvious, but I was checking all sorts of configuration files and modal classes to get there. There would have been far less ambiguity on where to look had I just started designing tests near the outset.
-        </p>
-
-        <h4>Cardinal Rule #2: Read the Damn Stack Trace</h4>
-
-        <p class='command'>
-            rspec spec/models/crops_spec.rb
-        </p>
-
-<pre class="prettyprint" id='trace'>
-    <code>
-An error occurred while loading ./spec/models/crops_spec.rb.
-Failure/Error: require File.expand_path('../config/environment', __dir__)
-
-TypeError:
-    no implicit conversion of nil into String
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:300:in `quote'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:300:in `block in origins'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:293:in `map'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:293:in `origins'
-# ./config/initializers/cors.rb:10:in `block (2 levels) in main'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:60:in `instance_eval'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:60:in `allow'
-# ./config/initializers/cors.rb:9:in `block in main'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:45:in `instance_eval'
-# /Users/mbechtel/.rvm/gems/ruby-2.6.1/gems/rack-cors-1.1.1/lib/rack/cors.rb:45:in `initialize'
-...
-    </code>
-</pre>
-
-        <p>
-            The first line here (File.expand_path(...)), comes from the rails_helper.rb file that is created when running the command <span class='command'>rails g rspec:install</span>. It had come up often in my earlier debugging as well, because one of those final arguments reaches down into the depths of Rails' system and pokes one of the Rails methods using a syntax that was depreciated in Rails 2.7. It is a single line that was for a couple days extremely confounding. Since this is a line of code that, as a provided configuration, I was trying ever so hard to avoid editing.
+	        While much easier to move around, Emacs can become quite congested if too many windows are open, but that is true of any editor. What really becomes congested is your RAM while running the program. Emacs is significantly larger of a program to run than the other options. The size of the help documentation is also significantly larger than Vim's, and the learning curve is a bit steeper.
         </p>
 
         <p>
-            This, of course, led me on another search through Stack Overflow. I stumbled upon <a href='https://stackoverflow.com/a/52990486' target='_blank'>this Stack Overflow answer</a>, which works, but was not an answer that I found to be sufficient, nor was the questioner's stack trace the same as mine. At the very least, it allowed me to finally work on my actual tests. But, again, if my goal is to set up tests for the benefit of other developers, asking them to run a non-standard command to run tests was not an acceptable solution.
+          Developers who swear by Emacs point to how it is highly customizable. Indeed, you can develop your own plugins for Emacs. And like Vim, there is a helpful tutorial for beginners.
+        </p>
+
+        <h4>Nano</h4>
+
+        <p>
+	        <a href="https://www.nano-editor.org/" target="_blank">Nano</a> is by far the most beginner-friendly of the text editors discussed today. The top 12 key combination commands appear at the bottom of the program once opened with <span class="command">nano myFile.txt</span>. Or better yet, one can open an empty file with a simple <span class="command">nano</span>.
         </p>
 
         <p>
-            I could finally test my tests, and that was the main priority for a while. It took some time to return to the issue and a lot of unnecessary <span class='command'>bundle exec rake spec</span> in the meantime.
+      	  Nano has been around only since 2000, developed as a replacement for the Pico editor. Compared to the other two options, Nano comes with zero syntax highlighting capability. It also comes with some really cool search features that are lacking or difficult to access in other text editors. Somewhat limited in other advanced features, though, there is no real tutoring file because it is not needed. Commands descriptions are easily found from the always accessible get help menu. Saving is a simple ctrl + o; exiting just takes ctrl + x.
         </p>
 
         <p>
-          A poor configuration somewhere? More problems with depreciated methods? Not understanding how some other gems like FactoryBot or Database-Cleaner mess with the system? The scenarios were pretty hard to debug for someone really just trying to get RSpec working for the first time. Perhaps it is best to ask for help...
-        </p>
-
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/nFuxpphnN0k?start=16" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-        <p>
-            or...   <a href='#trace'>Let's look at that stack trace again.</a> If you have done any development in Rails, you have probably seen a similar output a couple dozen times. It is the message that appears whenever you have a problem with your CORS configuration. But we're not working in an environment that needs to limit access. Tests are run in the test environment to preserve our development database. Why would CORS be an issue?
+          Commands that are now standard in text editors (ctrl + a as select-all; ctrl + c to cut to memory;  ctrl + v to paste from memory) are available in Nano.
         </p>
 
         <p>
-            Because the Rails application has an initializer that requires a string as an allowed origin and will not boot in any circumstance without one. The development and production environments are still working, but the test environment is not. The stack trace points us to cors.rb line 10.
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/c3754044bbfb158913f95c7efccba4e2.js"></script>
-
-        <p>
-          And the application.yml file that Figaro is looking at:
-        </p>
-
-        <script src="https://gist.github.com/mattbechtel1/69b0be129afded68d6e40befc68c7651.js"></script>
-
-        <p>
-            And there it is, just like the stack trace was telling us all along. Rails cannot convert a nil to a string, and because the allowed_origin variable for the test environment is nil, CORS does not know how to handle HTTP requests. Adding an allowed_origin variable for the test environment solves the problem.
-        </p>
-
-        <p>
-            I spent a total of two days smashing these bugs despite it really only taking following one of two cardinal rules of programming to solve or shorten the amount of wasted time. I could have either started testing when the application was smaller or simply read the damn stack trace, and my problems would have been limited to a few hours at most.
+          There really is not much more to say about Nano. Once one learns the more advanced Vim or Emacs, nano really does not stand out as a coding editing environment for much more than quick simple changes. But for someone editing in the terminal for the first time, Nano's short learning curve makes it a good entry vehicle to text editing.
         </p>
 
     </section>
     <div class="post-content">
       <aside class="share">
         <span>Share this: </span>
-        <a href="http://twitter.com/share?text=Two Cardinal Rules of Programmingsamp;url=http://mattbechtel1.github.io/posts/test-first&amp;hashtags=web,dev,blog"
+        <a href="http://twitter.com/share?text=Linux Text Editorsamp;url=http://mattbechtel1.github.io/posts/linux-text-editors&amp;hashtags=web,dev,blog"
           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
           <i class="icon icon-twitter-rounded"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/test-first
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://mattbechtel1.github.io/posts/linux-text-editors
           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
           <i class="icon icon-facebook-rounded"></i>
         </a>
@@ -183,8 +157,8 @@ TypeError:
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'hello-world-extended';
-        var disqus_identifier = '/test-first';
-        var disqus_title = 'Two Cardinal Rules of Programming';
+        var disqus_identifier = '/linux-text-editors';
+        var disqus_title = 'Options for Text Editing In Linux';
         var disqus_url = 'http://mattbechtel1.github.io';
         (function () { // DON'T EDIT BELOW THIS LINE
           var d = document, s = d.createElement('script');
