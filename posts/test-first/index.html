@@ -59,19 +59,19 @@
         </p>
 
         <p>
-            With the crazy sprint to go from a framework to multi-model application with more-or-less a one-person time, some standard agile techniques had to fall by the wayside. In the case of Succotash, an obvious candidate for skipping was the testing process. 
+            With the crazy sprint to go from a framework to multi-model application with more-or-less a one-person team, some standard agile techniques had to fall by the wayside. In the case of Succotash, an obvious candidate was the testing process. 
         </p>
 
         <p>
-            Here we are ten weeks later, and Succotash v1.0 is already deployed on its 8th patch. Many of the recent patches, particularly to the Rails backend, are for the benefit of developers rather than users. It is my poor attempt to invite others to get involved. The next step, then, is to add tests to ensure that other developers do not make changes that adversely affect the existing models and controllers.
+            Here we are ten weeks later, and Succotash v1.0 is already deployed on its 8th patch. Many of the recent patches, particularly to the Rails backend, are for the benefit of developers more than users. It is my poor attempt to invite others to get involved. The next step, then, is to add tests to ensure that other developers do not make changes that adversely affect the existing models and controllers.
         </p>
 
         <p>
-            I decide to use RSpec, read a few blogs, add what seem like the necessary gems, (foolishly update the app's Ruby version to 2.7), set up a few very basic tests for the simplest controller class, and run the test... and it all falls apart.
+            I decide to use RSpec, read a few blogs, add some new gems that I believe are necessary, (foolishly update the app's Ruby version to 2.7), set up a few very basic tests for the simplest controller class, and run the test... and it all falls apart.
         </p>
 
         <p>
-            First of all, because of the Ruby version update, I was getting some really ugly stack trace write outs every time I would boot a Rails server or run a Rails console. Some stack overflow searches suggested that it is not a real problem: some syntax patterns had been depreciated and Rails has not been updated its own file's syntax to adjust. But I get fed up enough with the stack trace that I revert to the Ruby 2.6.1 version with which Succotash's API originally built.
+            First of all, because of the Ruby version update, I was getting some really ugly stack trace write outs every time I would boot a Rails server or run a Rails console. Some stack overflow searches suggested that it is not a real problem: some syntax patterns had been deprecated and Rails has not updated its own files' syntax to adjust. But I get fed up enough with the stack trace that I revert to the Ruby 2.6.1 version with which Succotash's API originally built.
         </p>
 
         <p>
@@ -79,7 +79,7 @@
         </p>
 
         <p>
-            Blogs are an awesome resource, especially for Ruby-related topics, given the community's reputation for kindness and helpfulness. But sometimes, it is just better to go to the source, especially when you have 3 blogs are telling you to make 3 different changes to the configuration file that RSpec kindly gives you when you run <span class='command'>rails g rspec:install</span>.
+            Blogs are an awesome resource, especially for Ruby-related topics, given the community's reputation for kindness and helpfulness. But sometimes, it is just better to go to the source, especially when you have 3 blogs are telling you to make 3 different changes to the configuration file that RSpec kindly provides for you when you run <span class='command'>rails g rspec:install</span>.
         </p>
 
         <p>
@@ -87,11 +87,11 @@
         </p>
 
         <p>
-            While I did complicate things a bit by using FactoryBot, it was not appear to be the source of any problems. I appeared to be ready to try RSpec again. That's when things really went downhill.
+            While I did complicate things a bit by using FactoryBot, it did not appear to be the source of any problems. I appeared to be ready to try RSpec again. That's when things really went downhill.
         </p>
 
         <p>
-            The lesson though is, while it is almost always possible to retrofit basic functionalities and features back into your code after spending months working on improving your project--<a href='../retrofitting-pgadmin-to-an-app/'>and this blog has  covered one such instance in depth</a>--there is usually a reason that some of these features are built into basic application generators. It can be really hard to debug problems when you add them later, especially when those features' primary purpose is to assist with debugging. My problems with retrofitting RSpec are in hindsight obvious, but I was checking all sorts of configuration files and modal classes to get there. There would have been far less ambiguity on where to look had I just started designing tests near the outset.
+            The lesson though is, while it is almost always possible to retrofit basic functionalities and features back into your code after spending months working on improving your project--<a href='../retrofitting-pgadmin-to-an-app/'>and this blog has  covered one such instance in depth</a>--there is usually a reason that some of these features are built into basic application generators. It can be really hard to debug problems when you add them later, especially when those features' primary purpose is to assist with debugging. My problems with retrofitting RSpec are in hindsight obvious, but I was checking all sorts of configuration files and model classes to get there. There would have been far less ambiguity on where to look had I just started designing tests near the outset.
         </p>
 
         <h4>Cardinal Rule #2: Read the Damn Stack Trace</h4>
@@ -122,7 +122,7 @@ TypeError:
 </pre>
 
         <p>
-            The first line here (File.expand_path(...)), comes from the rails_helper.rb file that is created when running the command <span class='command'>rails g rspec:install</span>. It had come up often in my earlier debugging as well, because one of those final arguments reaches down into the depths of Rails' system and pokes one of the Rails methods using a syntax that was depreciated in Rails 2.7. It is a single line that was for a couple days extremely confounding. Since this is a line of code that, as a provided configuration, I was trying ever so hard to avoid editing.
+            The first line here (File.expand_path(...)), comes from the rails_helper.rb file that is created when running the command <span class='command'>rails g rspec:install</span>. It had come up often in my earlier debugging as well, because one of those final arguments reaches down into the depths of Rails' system and pokes one of the Rails methods using a syntax that was deprecated in Rails 2.7. It is a single line that was for a couple days extremely confounding. Since this is a line of code that, as a provided configuration, I was trying ever so hard to avoid editing.
         </p>
 
         <p>
@@ -134,7 +134,7 @@ TypeError:
         </p>
 
         <p>
-          A poor configuration somewhere? More problems with depreciated methods? Not understanding how some other gems like FactoryBot or Database-Cleaner mess with the system? The scenarios were pretty hard to debug for someone really just trying to get RSpec working for the first time. Perhaps it is best to ask for help...
+          A poor configuration somewhere? More problems with deprecated methods? Not understanding how some other gems like FactoryBot or Database-Cleaner mess with the system? The scenarios were pretty hard to debug for someone really just trying to get RSpec working for the first time. Perhaps it is best to ask for help...
         </p>
 
         <iframe width="560" height="315" src="https://www.youtube.com/embed/nFuxpphnN0k?start=16" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -156,11 +156,11 @@ TypeError:
         <script src="https://gist.github.com/mattbechtel1/69b0be129afded68d6e40befc68c7651.js"></script>
 
         <p>
-            And there it is, just like the stack trace was telling us all along. Rails cannot convert a nil to a string, and because the allowed_origin variable for the test environment is nil, CORS does not know how to handle HTTP requests. Adding an allowed_origin variable for the test environment solves the problem.
+            And there it is, just like the stack trace was telling us all along. Rails cannot convert nil to a string, and because the allowed_origin variable for the test environment is nil, CORS does not know how to handle HTTP requests. Adding an allowed_origin variable for the test environment solves the problem.
         </p>
 
         <p>
-            I spent a total of two days smashing these bugs despite it really only taking following one of two cardinal rules of programming to solve or shorten the amount of wasted time. I could have either started testing when the application was smaller or simply read the damn stack trace, and my problems would have been limited to a few hours at most.
+            I spent a total of two days squashing these bugs despite it really only taking following one of two cardinal rules of programming to solve or shorten the amount of wasted time. I could have either started testing when the application was smaller or simply read the damn stack trace, and my problems would have been limited to a few hours at most.
         </p>
 
     </section>
